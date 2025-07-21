@@ -21,6 +21,21 @@ Includes examples of:
 
 ---
 
+### 🐧 [Linux + EC2 Setup](./linux-ec2-setup)
+
+Hands-on setup of an Ubuntu EC2 instance using AWS, with secure SSH access and development via VS Code Remote.  
+Also includes Linux command practice inspired by DevOps workflows.
+
+Includes:
+
+- Launching and connecting to EC2 (SSH + `.pem` key)
+- Creating an SSH config for quick access
+- Using VS Code Remote - SSH to work on EC2
+- Practicing common Linux commands (`pwd`, `ls`, `mkdir`, `rm -rvf`, etc.)
+
+➡️ Detailed README inside: [`linux-ec2-setup/README.md`](./linux-ec2-setup/README.md)
+
+
 ## 🧠 About
 
 This repository serves as a personal DevOps lab to:
