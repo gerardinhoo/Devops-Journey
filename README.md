@@ -17,7 +17,7 @@ Includes examples of:
 - Loops and functions
 - File handling with condition checks
 
-➡️ Detailed README inside: [`bash_fundamentals.sh/README.md`](./bash_fundamentals.sh/README.md)
+➡️ Detailed README inside: [`bash_fundamentals/README.md`](./bash_fundamentals.sh/README.md)
 
 ---
 
