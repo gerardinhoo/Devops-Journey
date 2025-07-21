@@ -33,7 +33,7 @@ Includes:
 - Using VS Code Remote - SSH to work on EC2
 - Practicing common Linux commands (`pwd`, `ls`, `mkdir`, `rm -rvf`, etc.)
 
-➡️ Detailed README inside: [`linux-ec2-setup/README.md`](./linux-ec2-setup/README.md)
+➡️ Detailed README inside: [`linux_devops/README.md`](./linux_devops/README.md)
 
 
 ## 🧠 About
