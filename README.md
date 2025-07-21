@@ -50,7 +50,6 @@ This repository serves as a personal DevOps lab to:
 
 As I continue learning, this repo will grow to include:
 
-- 🐧 Linux scripting exercises
 - 🐳 Docker basics and images
 - ☁️ Terraform and cloud deployments
 - 🔧 CI/CD pipelines with GitHub Actions
