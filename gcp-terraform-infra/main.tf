@@ -4,11 +4,11 @@ provider "google" {
    credentials = file("terraform-admin-key.json")
    project    = var.project_id
    region     = var.region
-   zone      = var.region
+   zone       = var.zone
 }
 
 resource "google_compute_network" "vpc_network" {
-   name                    = var.network_name
+   name                    = var.vpc_name
    auto_create_subnetworks = false 
 }
 
@@ -20,7 +20,7 @@ resource "google_compute_subnetwork" "subnet" {
 }
 
 resource "google_compute_firewall" "allow-ssh" {
-   name    = "allow-ssh"
+   name    = var.firewall_name
    network = google_compute_network.vpc_network.name
 
 
@@ -46,7 +46,7 @@ resource "google_compute_instance" "vm_instance" {
 
    network_interface {
       network    = google_compute_network.vpc_network.id
-      subnetwork = google_compute_network.subnet.id
+      subnetwork = google_compute_subnetwork.subnet.id
 
       access_config  {} # This enables a ip_cidr_range
    }

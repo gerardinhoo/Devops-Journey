@@ -46,3 +46,13 @@ variable "machine_type" {
   type        = string
   default     = "e2-micro"
 }
+
+variable "vpc_name" {
+  description = "Name of the VPC network"
+  type        = string
+}
+
+variable "firewall_name" {
+  description = "Name of the Firewall"
+  type        = string
+}
