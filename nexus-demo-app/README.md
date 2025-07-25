@@ -26,9 +26,6 @@ This project is configured to deploy artifacts to a hosted Nexus repository (mav
 🔹 pom.xml Configuration
 Make sure your pom.xml includes the following:
 
-xml
-Copy
-Edit
 <distributionManagement>
   <repository>
     <id>nexus</id>
@@ -51,9 +48,6 @@ Add your Nexus credentials to ~/.m2/settings.xml:
 🔹 Deploy the Artifact
 Run the following command:
 
-bash
-Copy
-Edit
 mvn clean deploy
 Once successful, the .jar and .pom files will be uploaded to your Nexus repository and visible in the UI:
 
