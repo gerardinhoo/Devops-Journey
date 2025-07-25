@@ -17,12 +17,6 @@ variable "zone" {
    default     = "us-central1-a"
 }
 
-variable "network_name" {
-   description = "Name of the VPC network"
-   type        = string
-   default     = "devops-vpc"
-}
-
 variable "subnet_name" {
   description = "Name of the subnet"
   type        = string
