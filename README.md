@@ -36,6 +36,40 @@ Includes:
 ➡️ Detailed README inside: [`linux_devops/README.md`](./linux_devops/README.md)
 
 
+---
+
+### ☕ [Nexus Demo App (Maven Deployment)](./nexus-demo-app)
+
+A simple Java application created with Maven to demonstrate artifact deployment to a **hosted Nexus repository**.  
+Covers full configuration from `pom.xml` to `.m2/settings.xml` and shows how to push `.jar` files to Nexus.
+
+Includes:
+
+- Maven `distributionManagement` configuration  
+- Nexus credentials setup in `settings.xml`  
+- Using `mvn clean deploy` to upload builds  
+- Practical use of Nexus as a private artifact repo
+
+➡️ Detailed README inside: [`nexus-demo-app/README.md`](./nexus-demo-app/README.md)
+
+---
+
+### 📦 [Nexus 3 Installation & Setup](./maven-nexus)
+
+Step-by-step guide to install and configure **Sonatype Nexus Repository Manager 3** on an Ubuntu EC2 instance.
+
+Covers:
+
+- Downloading and extracting Nexus  
+- Creating a `nexus` system user  
+- Setting permissions and configuring `nexus.rc`  
+- Creating a `systemd` service to run Nexus on boot  
+- Accessing the Nexus UI and retrieving the admin password
+
+➡️ Detailed README inside: [`maven-nexus/README.md`](./maven-nexus/README.md)
+
+---
+
 ## 🧠 About
 
 This repository serves as a personal DevOps lab to:
