@@ -1,3 +1,5 @@
+# Automate software setup on VM startup via startup.sh
+
 #!/bin/bash
 
 # Update the package index 
