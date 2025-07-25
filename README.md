@@ -35,7 +35,6 @@ Includes:
 
 ➡️ Detailed README inside: [`linux_devops/README.md`](./linux_devops/README.md)
 
-
 ---
 
 ### ☕ [Nexus Demo App (Maven Deployment)](./nexus-demo-app)
@@ -45,9 +44,9 @@ Covers full configuration from `pom.xml` to `.m2/settings.xml` and shows how to 
 
 Includes:
 
-- Maven `distributionManagement` configuration  
-- Nexus credentials setup in `settings.xml`  
-- Using `mvn clean deploy` to upload builds  
+- Maven `distributionManagement` configuration
+- Nexus credentials setup in `settings.xml`
+- Using `mvn clean deploy` to upload builds
 - Practical use of Nexus as a private artifact repo
 
 ➡️ Detailed README inside: [`nexus-demo-app/README.md`](./nexus-demo-app/README.md)
@@ -60,13 +59,27 @@ Step-by-step guide to install and configure **Sonatype Nexus Repository Manager 
 
 Covers:
 
-- Downloading and extracting Nexus  
-- Creating a `nexus` system user  
-- Setting permissions and configuring `nexus.rc`  
-- Creating a `systemd` service to run Nexus on boot  
+- Downloading and extracting Nexus
+- Creating a `nexus` system user
+- Setting permissions and configuring `nexus.rc`
+- Creating a `systemd` service to run Nexus on boot
 - Accessing the Nexus UI and retrieving the admin password
 
 ➡️ Detailed README inside: [`maven-nexus/README.md`](./maven-nexus/README.md)
+
+---
+
+### ☁️ [GCP Infrastructure with Terraform](./gcp-terraform-infra)
+
+Provisioning and managing infrastructure on Google Cloud using **Terraform**, including:
+
+- Creating a VPC, Subnet, Firewall, and VM Instance
+- Writing `main.tf`, `variables.tf`, `terraform.tfvars`, and `outputs.tf`
+- Automatically installing Docker on the VM via a `startup.sh` script
+- SSH into the VM and verify provisioning
+- Understand Terraform state, remote provisioning, and IaC best practices
+
+➡️ Detailed README inside: [`gcp-terraform-infra/README.md`](./gcp-terraform-infra/README.md)
 
 ---
 
