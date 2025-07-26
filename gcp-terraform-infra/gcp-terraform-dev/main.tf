@@ -34,7 +34,7 @@ resource "google_compute_firewall" "allow-ssh" {
 }
 
 resource "google_compute_instance" "vm_instance" {
-   name         = var.vm_name
+   name         = "${var.vm_name}-${var.env}"  # results in devops-vm-dev or devops-vm-prod
    machine_type = var.machine_type
    zone         = var.zone
 
@@ -52,7 +52,7 @@ resource "google_compute_instance" "vm_instance" {
    }
 
    metadata_startup_script = fileexists("startup.sh") ? file("startup.sh") : ""
-   tags = ["ssh"]
+   tags         = ["ssh", var.env]             # tags like ["ssh", "dev"] or ["ssh", "prod"]
 }
    
 

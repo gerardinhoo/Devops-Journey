@@ -50,3 +50,8 @@ variable "firewall_name" {
   description = "Name of the Firewall"
   type        = string
 }
+
+variable "env" {
+  description = "Environment name (dev or prod)"
+  type        = string
+}

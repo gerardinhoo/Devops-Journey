@@ -1,0 +1,8 @@
+project_id     = "devops-reliability-lab"
+region         = "us-central1"
+zone           = "us-central1-a"
+vpc_name       = "devops-vpc-dev"
+subnet_name    = "devops-subnet-dev"
+firewall_name  = "devops-firewall-dev"
+vm_name        = "devops-vm"
+env            = "dev"
