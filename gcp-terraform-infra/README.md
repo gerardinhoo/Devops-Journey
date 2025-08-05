@@ -76,43 +76,43 @@ gs://devops-terraform-state-bucket-gerard-20250725/gcp-terraform/prod/terraform.
 
 🚀 Commands to Use Workspaces
 
-# List all available workspaces
+### 6. List all available workspaces
 
-terraform workspace list
+- terraform workspace list
 
-# Create new workspaces (only once)
+### 7. Create new workspaces (only once)
 
-terraform workspace new dev
-terraform workspace new prod
+- terraform workspace new dev
+- terraform workspace new prod
 
-# Switch between them
+### 8. Switch between them
 
-terraform workspace select dev
-terraform apply # Applies to dev environment
+- terraform workspace select dev
+- terraform apply # Applies to dev environment
 
-terraform workspace select prod
-terraform apply # Applies to prod environment
+- terraform workspace select prod
+- terraform apply # Applies to prod environment
 
 ✅ Deployment Verified
 
 Both environments were successfully applied and tested with the following outputs:
 
-Dev Output:
+**Dev Output**:
 
-vm_name = "devops-vm-dev"
-vm_external_ip = "34.133.136.20"
+- vm_name = "devops-vm-dev"
+- vm_external_ip = "34.133.136.20"
 
-Prod Output:
+**Prod Output**:
 
-vm_name = "devops-vm-prod"
-vm_external_ip = "34.63.125.105"
+- vm_name = "devops-vm-prod"
+- vm_external_ip = "34.63.125.105"
 
 ### 🔍 Why These Steps Matter
 
 | Step                     | Purpose                                                               |
 | ------------------------ | --------------------------------------------------------------------- |
 | **Terraform IaC**        | Declaratively and reproducibly manage infrastructure                  |
-| **Startup Script**       | Automatically configure VMs on boot (e.g., install Docker)            |
+| **Startup Script**       | Automatically configure VMs on boot (e.g., install Docker, git)       |
 | **Outputs**              | Feed key data into pipelines or dashboards (IP, resource names, etc.) |
 | **SSH Access**           | Verify and troubleshoot VM directly                                   |
 | **Terraform Lock File**  | Ensure consistent provider versions across environments               |
@@ -124,8 +124,8 @@ vm_external_ip = "34.63.125.105"
 
 We will now:
 
-- ✅ Store `terraform.tfstate` in a GCS bucket (remote backend)
-- ✅ Add Terraform workspaces for `dev` and `prod`
+- ✅ Store `terraform.tfstate` in a GCS bucket (remote backend) - Done
+- ✅ Add Terraform workspaces for `dev` and `prod` - Done
 
 * - 📦 Refactor into reusable Terraform modules (VPC, Compute, Firewall)
 
@@ -151,7 +151,7 @@ gcp-terraform-infra/
 
 ---
 
-## 📌 Note
+### 📌 Note
 
 All work is version-controlled and committed as milestones are completed. This README tracks major infrastructure setup before CI/CD integration begins.
 
