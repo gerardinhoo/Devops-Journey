@@ -34,26 +34,27 @@ resource "google_compute_firewall" "allow-ssh" {
 }
 
 resource "google_compute_instance" "vm_instance" {
-   name         = "${var.vm_name}-${var.env}"  # results in devops-vm-dev or devops-vm-prod
-   machine_type = var.machine_type
-   zone         = var.zone
+  name         = "${var.vm_name}-${var.env}"  # e.g., devops-vm-dev
+  machine_type = var.machine_type
+  zone         = var.zone
 
-   boot_disk {
-      initialize_params {
-         image = "debian-cloud/debian-11"
-      }
-   }
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2204-lts"
+    }
+  }
 
-   network_interface {
-      network    = google_compute_network.vpc_network.id
-      subnetwork = google_compute_subnetwork.subnet.id
+  network_interface {
+    network    = google_compute_network.vpc_network.id
+    subnetwork = google_compute_subnetwork.subnet.id
+    access_config {}
+  }
 
-      access_config  {} # This enables a ip_cidr_range
-   }
+  metadata_startup_script = file("startup.sh")  # Simple and clear
 
-   metadata_startup_script = fileexists("startup.sh") ? file("startup.sh") : ""
-   tags         = ["ssh", var.env]             # tags like ["ssh", "dev"] or ["ssh", "prod"]
+  tags = ["ssh", var.env]  # ["ssh", "dev"] or ["ssh", "prod"]
 }
+
    
 
 

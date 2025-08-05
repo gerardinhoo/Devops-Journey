@@ -21,10 +21,11 @@ This project provisions and manages a complete infrastructure on **Google Cloud 
 - **VPC** and **Subnet** created with custom CIDR block
 - **Firewall** rule allowing SSH (TCP port 22)
 - **VM Instance** with:
-  - Boot disk (Debian image)
+  - Boot disk (Ubuntu 22.04 LTS image)
   - Public IP address
   - SSH tag for firewall access
-  - Docker installed via `startup.sh` during boot
+  - Docker and Git installed via startup.sh during boot
+  - Verified via SSH (docker --version, git --version)
 
 ---
 
@@ -161,6 +162,19 @@ All work is version-controlled and committed as milestones are completed. This R
 This milestone was tagged as:  
 `v0.1.0 - Initial environment setup with dev/prod workspaces`
 
----
+---''### 🧪 VM Setup Verification (August 5, 2025)
 
-🗓️ Last Updated: July 25, 2025
+Successfully provisioned a Dev VM (`devops-vm-dev`) with:
+
+- Ubuntu 22.04 LTS base image
+- Docker and Git installed using a `startup.sh` script
+- Verified:
+  - Docker version 27.5.1
+  - Git version 2.34.1
+  - GitHub repo (`Devops-Journey`) cloned successfully
+- SSH login tested using:
+  ```bash
+  ssh gcp-devops
+  ```
+
+🗓️ Last Updated: August 05, 2025
