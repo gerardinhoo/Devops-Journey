@@ -23,4 +23,4 @@ jobs:
             docker pull your-dockerhub-username/simple-node-api:latest
             docker stop simple-node-api || true
             docker rm simple-node-api || true
-            docker run -d --name simple-node-api -p 80:3000 your-dockerhub-username/simple-node-api:latest
+            docker run -d --name simple-node-api -p 80:3000 gerardinhoo/simple-node-api:latest
