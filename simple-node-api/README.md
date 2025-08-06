@@ -83,6 +83,7 @@ How to expose services publicly using port forwarding and security groups
 
 📸 Live Screenshot:
 
+https://file+.vscode-resource.vscode-cdn.net/var/folders/k7/8ccml8fn5_qcps8q2wh_0lj80000gn/T/TemporaryItems/NSIRD_screencaptureui_3dC8hE/Screenshot%202025-08-06%20at%201.07.39%E2%80%AFAM.png?version%3D1754456876089
 
 🧰 Next Steps
  Add GitHub Actions for CI/CD pipeline
