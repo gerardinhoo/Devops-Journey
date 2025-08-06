@@ -1,0 +1,26 @@
+name: Deploy to GCP VM via SSH
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!README.md'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull your-dockerhub-username/simple-node-api:latest
+            docker stop simple-node-api || true
+            docker rm simple-node-api || true
+            docker run -d --name simple-node-api -p 80:3000 your-dockerhub-username/simple-node-api:latest
