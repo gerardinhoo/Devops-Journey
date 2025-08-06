@@ -1,10 +1,10 @@
-# 🚀 Simple Node API (Dockerized)
+# 🚀 Simple Node API (Dockerized:
 
 This is a simple Express-based Node.js API that responds with a welcome message. It's fully containerized using Docker and deployed on a real Ubuntu EC2 instance. The project is part of my DevOps learning journey practicing containerization, deployment, and remote server hosting.
 
 ---
 
-## 🧪 API Endpoint
+## 🧪 API Endpoin:
 
 GET /
 
@@ -14,7 +14,7 @@ GET /
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack:
 
 - Node.js
 - Express.js
@@ -25,7 +25,7 @@ GET /
 
 ---
 
-## 📦 Project Structure
+## 📦 Project Structur:
 
 simple-node-api/
 ├── Dockerfile
