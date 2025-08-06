@@ -83,6 +83,23 @@ Provisioning and managing infrastructure on Google Cloud using **Terraform**, in
 
 ---
 
+---
+
+### 🐳 [Dockerized Node.js App Deployment (EC2)](./simple-node-api)
+
+Containerized and deployed a simple Node.js API to an **Ubuntu EC2 instance** using Docker.  
+This project demonstrates containerizing an Express server, exposing it to the public internet, and verifying it live from a browser.
+
+Includes:
+
+- A lightweight Express server (`index.js`)
+- Dockerfile to build and run the app
+- Exposing port 3000 and verifying container output
+- `docker build`, `docker run`, and `docker ps` usage
+- Browser-accessible output via EC2 Public IP (`http://<EC2_IP>:3000`)
+
+➡️ Detailed README inside: [`simple-node-api/README.md`](./simple-node-api/README.md)
+
 ## 🧠 About
 
 This repository serves as a personal DevOps lab to:

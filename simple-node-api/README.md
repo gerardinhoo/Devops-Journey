@@ -81,8 +81,6 @@ How to run Docker containers on a remote EC2 instance
 
 How to expose services publicly using port forwarding and security groups
 
-
-
 🧰 Next Steps
  Add GitHub Actions for CI/CD pipeline
 
