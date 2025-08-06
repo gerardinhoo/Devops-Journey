@@ -1,1 +1,31 @@
+name: Deploy to EC2 via SSH
 
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@YOUR_EC2_PUBLIC_IP << 'EOF'
+            cd ~/Devops-Journey/simple-node-api
+            git pull origin main
+            docker stop simple-node-api || true
+            docker rm simple-node-api || true
+            docker rmi gerardinhoo/simple-node-api || true
+            docker pull gerardinhoo/simple-node-api
+            docker run -d -p 80:8080 --name simple-node-api gerardinhoo/simple-node-api
+          EOF
