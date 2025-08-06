@@ -83,6 +83,7 @@ How to expose services publicly using port forwarding and security groups
 
 📸 Live Screenshot
 
+<img width="1200" height="161" alt="Screenshot 2025-08-06 at 1 06 40 AM" src="https://github.com/user-attachments/assets/129b4471-4e67-4f4c-98f2-6317da8c7074" />
 
 🧰 Next Steps
  Add GitHub Actions for CI/CD pipeline
