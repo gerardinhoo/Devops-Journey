@@ -1,6 +1,6 @@
 # 🚀 DevOps Journey
 
-Welcome to my **DevOps learning journey** — a collection of hands-on practice projects to build foundational skills in automation, scripting, and cloud engineering.
+Welcome to my **DevOps learning journey**. A collection of hands-on practice projects to build foundational skills in automation, scripting, and cloud engineering.
 
 ---
 
