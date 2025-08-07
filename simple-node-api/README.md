@@ -30,7 +30,7 @@ This is a simple Express-based Node.js API that responds with a welcome message.
 
 ### ✅ Live public API from EC2
 
-![Live public API response](./assets/ece2-browser.png)
+![Live public API response](./assets/ec2-browser.png)
 
 ### ✅ GitHub Actions: CI/CD Workflow
 
@@ -59,34 +59,45 @@ COPY . .
 EXPOSE 8080
 CMD ["npm", "start"]
 
+```
+
 ---
 
-🧪 Run Locally (Dev)
+## 🛠 Run Locally (Dev)
 
 # Clone the repo
-git clone https://github.com/gerardinhoo/simple-node-api.git
-cd simple-node-api
 
-# Build image
-docker build -t simple-node-api .
+- git clone https://github.com/gerardinhoo/simple-node-api.git
+- cd simple-node-api
 
-# Run container
-docker run -p 3000:8080 simple-node-api
-Then visit: http://localhost:3000
+# Build Docker image
+
+- docker build -t simple-node-api .
+
+# Run the container
+
+- docker run -p 3000:8080 simple-node-api
+
+# Visit:
+
+- http://localhost:3000
 
 ---
 
-🌍 Deploy to EC2 (Manually)
+## 🌍 Deploy to EC2 (Manually)
 
 # SSH into EC2 instance
-ssh -i ~/.ssh/your-key.pem ubuntu@<your-ec2-public-ip>
+
+- ssh -i ~/.ssh/your-key.pem ubuntu@<your-ec2-public-ip>
 
 # Pull image
-docker pull gerardinhoo/simple-node-api
+
+- docker pull gerardinhoo/simple-node-api
 
 # Run container
-docker run -d -p 80:8080 --name simple-node-api gerardinhoo/simple-node-api
-Make sure port 80 is allowed in EC2 security group.
+
+- docker run -d -p 80:8080 --name simple-node-api gerardinhoo/simple-node-api
+- Make sure port 80 is allowed in EC2 security group.
 
 ---
 
@@ -97,13 +108,12 @@ Make sure port 80 is allowed in EC2 security group.
 name: Deploy to EC2 via SSH
 
 on:
-  push:
-    branches:
-      - main
+push:
+branches: - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+deploy:
+runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -128,30 +138,28 @@ jobs:
 
 ---
 
-🧠 What I Learned
-How to Dockerize a Node.js API
+## 🧠 What I Learned
 
-How to push Docker images to Docker Hub
+- How to Dockerize a Node.js API
 
-How to deploy apps on EC2 with SSH
+- How to push Docker images to Docker Hub
 
-How to configure GitHub Actions for CI/CD
+- How to deploy apps on EC2 with SSH
 
-GCP firewall + VM setup (WIP)
+- How to configure GitHub Actions for CI/CD
 
-How to expose services on a public IP
+- GCP firewall + VM setup (WIP)
+
+- How to expose services on a public IP
 
 ---
 
+## ✅ Next Steps
 
-✅ Next Steps
- Add monitoring with Prometheus + Grafana
+- Add monitoring with Prometheus + Grafana
 
- Auto-deploy to GCP via Terraform
+- Auto-deploy to GCP via Terraform
 
- Add a /healthz endpoint and health check in CI/CD
+- Add a /healthz endpoint and health check in CI/CD
 
- Deploy to Kubernetes (GKE)
-
-
-```
+- Deploy to Kubernetes (GKE)
