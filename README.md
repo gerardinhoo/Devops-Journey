@@ -114,9 +114,20 @@ This repository serves as a personal DevOps lab to:
 
 As I continue learning, this repo will grow to include:
 
-- 🐳 Docker basics and images
-- ☁️ Terraform and cloud deployments
-- 🔧 CI/CD pipelines with GitHub Actions
+This DevOps Journey is just getting started. Here's what's coming up:
+
+- ✅ Dockerized Node.js app with custom image hosted on Docker Hub
+- ✅ Manual EC2 deployment using SSH
+- ✅ CI/CD pipeline using GitHub Actions
+- 🚀 Monitoring with Prometheus + Grafana
+- ☁️ GCP deployment using Terraform (WIP)
+- 🔁 Health checks and auto-restarts via CI/CD
+- 🐳 Multi-container orchestration with Docker Compose
+- ☸️ Kubernetes deployment to GKE
+- 📈 Log aggregation and metrics tracking
+- 🛡️ Secrets management and environment hardening
+
+Stay tuned as this repo evolves into a full-scale DevOps showcase.
 
 Stay tuned!
 
