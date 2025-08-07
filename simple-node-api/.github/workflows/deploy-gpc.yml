@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '**'
-      - '!README.md'
+      - 'trigger.txt'  # Only trigger deploy when this dummy file is pushed
 
 jobs:
   deploy:
@@ -20,7 +19,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull your-dockerhub-username/simple-node-api:latest
+            docker pull gerardinhoo/simple-node-api:latest
             docker stop simple-node-api || true
             docker rm simple-node-api || true
             docker run -d --name simple-node-api -p 80:3000 gerardinhoo/simple-node-api:latest
