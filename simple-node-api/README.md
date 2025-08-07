@@ -1,44 +1,54 @@
-# 🚀 Simple Node API (Dockerized:
+# 🚀 Simple Node API (Dockerized & CI/CD Deployed)
 
-This is a simple Express-based Node.js API that responds with a welcome message. It's fully containerized using Docker and deployed on a real Ubuntu EC2 instance. The project is part of my DevOps learning journey practicing containerization, deployment, and remote server hosting.
+This is a minimal Express-based Node.js API that responds with a welcome message. It's fully Dockerized, pushed to Docker Hub, and deployed to an Ubuntu EC2 instance using **GitHub Actions** CI/CD pipeline.
+
+This project is part of my **DevOps Journey**, where I practiced containerization, CI/CD, remote deployment, and server configuration.
 
 ---
 
-## 🧪 API Endpoin:
+## 🔥 Live API Endpoint
 
+```http
 GET /
 
-### Response:
+Response:
 
 🚀 Hello from Gerard's Simple Node API!
 
+🛠️ Tech Stack
+Node.js + Express.js
+
+Docker (image hosted on Docker Hub)
+
+GitHub Actions (CI/CD)
+
+EC2 (Ubuntu)
+
+SSH Deployment
+
+Security Groups
+
+GCP alternative setup (WIP)
+
 ---
 
-## 🛠️ Tech Stack:
-
-- Node.js
-- Express.js
-- Docker
-- EC2 (Ubuntu)
-- Security Groups (AWS)
-- Remote Deployment with Public IP
-
----
-
-## 📦 Project Structur:
+📁 Project Structure
 
 simple-node-api/
 ├── Dockerfile
 ├── package.json
 ├── index.js
-└── README.md
+├── .github/workflows/deploy.yml
+├── README.md
+└── assets/
+    ├── curl-localhost.png
+    ├── ec2-browser.png
+    ├── github-actions.png
 
 
----
+🐳 Dockerfile Overview
+Dockerfile
 
-## 📄 Dockerfile Overview
-
-```dockerfile
 FROM node:18
 WORKDIR /app
 COPY package*.json ./
@@ -47,7 +57,7 @@ COPY . .
 EXPOSE 8080
 CMD ["npm", "start"]
 
-🚀 How to Run (Locally)
+💻 Run Locally
 
 # Clone the project
 git clone https://github.com/gerardinhoo/simple-node-api.git
@@ -56,39 +66,96 @@ cd simple-node-api
 # Build Docker image
 docker build -t simple-node-api .
 
-# Run the container locally
+# Run container locally
 docker run -p 3000:8080 simple-node-api
-Then visit: http://localhost:3000
+Open: http://localhost:3000
 
-🌐 How to Deploy on EC2 (Linux)
+🚀 CI/CD Deployment to EC2
+✅ GitHub Actions Workflow
+This project uses GitHub Actions to:
 
-# Pull image from Docker Hub (after pushing it there)
-docker pull gerardinhoo/simple-node-api
+Build Docker image
 
-# Run the container with port mapping
-sudo docker run -d -p 3000:8080 gerardinhoo/simple-node-api
-Then visit: http://<YOUR_EC2_PUBLIC_IP>:3000
+Push to Docker Hub
 
-Ensure port 3000 is open in the EC2 security group (inbound rule).
+SSH into EC2
 
-🧠 What I Learned
+Pull & deploy the new container
 
-How to dockerize a Node.js app
+🧪 Sample Workflow (.github/workflows/deploy.yml):
 
-How to push Docker images to Docker Hub
+name: Deploy to EC2 via SSH
 
-How to run Docker containers on a remote EC2 instance
+on:
+  push:
+    branches:
+      - main
 
-How to expose services publicly using port forwarding and security groups
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-🧰 Next Steps
- Add GitHub Actions for CI/CD pipeline
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
- Auto-build and deploy on Docker push
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@<YOUR_EC2_PUBLIC_IP> << 'EOF'
+            cd ~/Devops-Journey/simple-node-api
+            git pull origin main
+            docker stop simple-node-api || true
+            docker rm simple-node-api || true
+            docker rmi gerardinhoo/simple-node-api || true
+            docker pull gerardinhoo/simple-node-api
+            docker run -d -p 80:8080 --name simple-node-api gerardinhoo/simple-node-api
+          EOF
+🌐 Access on EC2
+Make sure port 80 is open in your EC2 security group.
 
+After deployment, access your app at:
 
+http://<YOUR_EC2_PUBLIC_IP>
+✅ You should see:
 
+🚀 Hello from Gerard's Simple Node API!
 
+📸 Screenshots
 
-# Trigger deploy
+✅ Live in Browser on EC2
+
+![Deployed on EC2](./assets/ec2-browser.png)
+
+✅ GitHub Actions Build + Deploy
+
+![CI/CD successful](./assets/github-actions.png)
+
+📚 What I Learned
+✅ How to:
+
+Dockerize a Node.js app
+
+Push Docker images to Docker Hub
+
+Run Docker containers on EC2
+
+Set up SSH-based CI/CD with GitHub Actions
+
+Expose public APIs with security group/firewall configuration
+
+Troubleshoot network/firewall issues on GCP and AWS
+
+🔜 Next Steps
+ Add Prometheus + Grafana for monitoring
+
+ Add logging with Winston/Morgan
+
+ Explore multi-stage Docker builds
+
+ Set up GCP VM as a secondary deployment (in progress)
+```
