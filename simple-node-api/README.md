@@ -1,6 +1,21 @@
 # 🚀 Simple Node API (Dockerized)
 
-This is a simple Express-based Node.js API that responds with a welcome message. It's fully containerized using Docker and deployed to a live Ubuntu EC2 instance using GitHub Actions + SSH deployment. This project is part of my DevOps Journey to practice infrastructure setup, containerization, and CI/CD workflows.
+This project showcases a fully Dockerized Node.js API deployed via **GitHub Actions** to an **AWS EC2 instance**, with **Prometheus + Grafana** monitoring enabled.
+
+It’s part of my **DevOps Journey** to practice:
+
+- CI/CD pipelines with GitHub Actions
+- Containerization with Docker
+- SSH-based deployments to EC2
+- App monitoring and observability
+
+---
+
+## 📐 Architecture Overview
+
+Here’s a visual of the end-to-end setup:
+
+![DevOps Architecture Diagram](./assets/devops-workflow.png)
 
 ---
 
