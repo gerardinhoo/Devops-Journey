@@ -138,6 +138,55 @@ runs-on: ubuntu-latest
 
 ---
 
+---
+
+## 📈 Monitoring with Prometheus + Grafana
+
+This project includes a production-grade monitoring setup for the Simple Node API using:
+
+- 🟣 **Prometheus** to scrape custom metrics from `/metrics`
+- 📊 **Grafana** to visualize performance and uptime
+- 🐳 **Docker Compose** to orchestrate the app, Prometheus, and Grafana
+
+### 📊 Metrics Monitored
+
+| Panel                          | Description                                                        |
+| ------------------------------ | ------------------------------------------------------------------ |
+| **HTTP Request Duration (ms)** | Visualizes API response latency using Prometheus histogram buckets |
+| **App Uptime**                 | Real-time status (1 = up, 0 = down) scraped from the app           |
+
+### 🖼️ Sample Screenshots
+
+| Dashboard                            | App                      | Prometheus                                             |
+| ------------------------------------ | ------------------------ | ------------------------------------------------------ |
+| ![Dashboard](./assets/dashboard.png) | ![App](./assets/app.png) | ![Prometheus Targets](./assets/prometheus-targets.png) |
+
+### 📂 Dashboard JSON
+
+To reuse or import the Grafana dashboard:
+
+- [`monitoring-dashboard.json`](./monitoring-dashboard.json)
+
+---
+
+## ✅ Run the Monitoring Stack
+
+```bash
+# Start app, Prometheus, and Grafana
+docker-compose up -d
+
+- Node.js App → http://localhost:8080
+
+- Prometheus → http://localhost:9090
+
+- Grafana → http://localhost:3000
+
+- Default login: admin / admin
+
+```
+
+---
+
 ## 🧠 What I Learned
 
 - How to Dockerize a Node.js API
@@ -148,18 +197,26 @@ runs-on: ubuntu-latest
 
 - How to configure GitHub Actions for CI/CD
 
-- GCP firewall + VM setup (WIP)
+- How to set up a full monitoring stack with Prometheus + Grafana
+
+- How to expose metrics from a Node.js app using prom-client
 
 - How to expose services on a public IP
+
+- GCP firewall + VM setup (WIP)
 
 ---
 
 ## ✅ Next Steps
-
-- Add monitoring with Prometheus + Grafana
 
 - Auto-deploy to GCP via Terraform
 
 - Add a /healthz endpoint and health check in CI/CD
 
 - Deploy to Kubernetes (GKE)
+
+- Add alerts in Grafana or Prometheus
+
+- Add system resource monitoring (CPU, memory, event loop lag)
+
+---
