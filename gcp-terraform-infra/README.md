@@ -38,9 +38,9 @@ A high-level view of the infrastructure provisioning using Terraform and GCP:
 
 #### ✅ VPC and Subnet - Dev And Prod Environments
 
-##### ✅ Dev Environment
-
 Created a custom VPC and subnet with defined IP ranges.
+
+##### ✅ Dev Environment
 
 ![VPC + Subnet Dev](./assets/vpc-subnet-dev.png)
 
