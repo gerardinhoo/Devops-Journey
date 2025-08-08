@@ -40,7 +40,9 @@ A high-level view of the infrastructure provisioning using Terraform and GCP:
 
 Created a custom VPC and subnet with defined IP ranges.
 
-![VPC + Subnet](./assets/vpc-subnet.png)
+![VPC + Subnet Dev](./assets/vpc-subnet-dev.png)
+
+<!-- ![VPC + Subnet Prod](./assets/vpc-subnet-prod.png) -->
 
 ---
 
