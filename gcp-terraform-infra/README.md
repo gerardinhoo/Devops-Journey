@@ -42,7 +42,9 @@ Created a custom VPC and subnet with defined IP ranges.
 
 ![VPC + Subnet Dev](./assets/vpc-subnet-dev.png)
 
-<!-- ![VPC + Subnet Prod](./assets/vpc-subnet-prod.png) -->
+---
+
+![VPC + Subnet Prod](./assets/vpc-subnet-prod.png)
 
 ---
 
