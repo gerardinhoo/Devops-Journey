@@ -9,6 +9,7 @@
   "author": "Gerard Eklu",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "prom-client": "^15.1.3"
   }
 }
