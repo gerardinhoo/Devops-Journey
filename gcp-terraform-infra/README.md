@@ -120,10 +120,10 @@ GCP-TERRAFORM-INFRA/
 
 - [x] Remote backend in GCS configured
 - [x] Terraform workspaces (dev/prod) setup
-- [ ] Monitoring via Stackdriver or Prometheus
+- [ ] Monitoring via Stackdriver or Prometheus (GCP infra)
 - [ ] CI/CD with GitHub Actions for Terraform
 - [ ] Reusable modules refactor
-- [ ] Secrets management via Vault or GCP
+- [ ] Secrets management via Vault or GCP Secrets Manager
 
 ---
 
