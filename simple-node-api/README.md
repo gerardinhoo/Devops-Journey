@@ -1,12 +1,12 @@
-# 🚀 Simple Node API (Dockerized:
+# 🚀 Simple Node API (Dockerized)
 
-This is a simple Express-based Node.js API that responds with a welcome message. It's fully containerized using Docker and deployed on a real Ubuntu EC2 instance. The project is part of my DevOps learning journey practicing containerization, deployment, and remote server hosting.
+This is a simple Express-based Node.js API that responds with a welcome message. It's fully containerized using Docker and deployed to a live Ubuntu EC2 instance using GitHub Actions + SSH deployment. This project is part of my DevOps Journey to practice infrastructure setup, containerization, and CI/CD workflows.
 
 ---
 
-## 🧪 API Endpoin:
+## 🔥 Live API Endpoint
 
-GET /
+**GET /**
 
 ### Response:
 
@@ -14,18 +14,31 @@ GET /
 
 ---
 
-## 🛠️ Tech Stack:
+## 🛠 Tech Stack
 
-- Node.js
-- Express.js
-- Docker
+- Node.js + Express.js
+- Docker (image hosted on Docker Hub)
+- GitHub Actions (CI/CD)
 - EC2 (Ubuntu)
-- Security Groups (AWS)
-- Remote Deployment with Public IP
+- SSH Deployment
+- Security Groups
+- GCP alternative setup (WIP)
 
 ---
 
-## 📦 Project Structur:
+## 📸 Screenshots
+
+### ✅ Live public API from EC2
+
+![Live public API response](./assets/ec2-browser.png)
+
+### ✅ GitHub Actions: CI/CD Workflow
+
+![GitHub Actions Deploy Job](./assets/github-actions.png)
+
+---
+
+## 📁 Project Structure
 
 simple-node-api/
 ├── Dockerfile
@@ -33,12 +46,11 @@ simple-node-api/
 ├── index.js
 └── README.md
 
-
 ---
 
-## 📄 Dockerfile Overview
+## 🐳 Dockerfile Overview
 
-```dockerfile
+```Dockerfile
 FROM node:18
 WORKDIR /app
 COPY package*.json ./
@@ -47,49 +59,107 @@ COPY . .
 EXPOSE 8080
 CMD ["npm", "start"]
 
-🚀 How to Run (Locally)
+```
 
-# Clone the project
-git clone https://github.com/gerardinhoo/simple-node-api.git
-cd simple-node-api
+---
+
+## 🛠 Run Locally (Dev)
+
+# Clone the repo
+
+- git clone https://github.com/gerardinhoo/simple-node-api.git
+- cd simple-node-api
 
 # Build Docker image
-docker build -t simple-node-api .
 
-# Run the container locally
-docker run -p 3000:8080 simple-node-api
-Then visit: http://localhost:3000
+- docker build -t simple-node-api .
 
-🌐 How to Deploy on EC2 (Linux)
+# Run the container
 
-# Pull image from Docker Hub (after pushing it there)
-docker pull gerardinhoo/simple-node-api
+- docker run -p 3000:8080 simple-node-api
 
-# Run the container with port mapping
-sudo docker run -d -p 3000:8080 gerardinhoo/simple-node-api
-Then visit: http://<YOUR_EC2_PUBLIC_IP>:3000
+# Visit:
 
-Ensure port 3000 is open in the EC2 security group (inbound rule).
+- http://localhost:3000
 
-🧠 What I Learned
+---
 
-How to dockerize a Node.js app
+## 🌍 Deploy to EC2 (Manually)
 
-How to push Docker images to Docker Hub
+# SSH into EC2 instance
 
-How to run Docker containers on a remote EC2 instance
+- ssh -i ~/.ssh/your-key.pem ubuntu@<your-ec2-public-ip>
 
-How to expose services publicly using port forwarding and security groups
+# Pull image
 
-🧰 Next Steps
- Add GitHub Actions for CI/CD pipeline
+- docker pull gerardinhoo/simple-node-api
 
- Auto-build and deploy on Docker push
+# Run container
 
+- docker run -d -p 80:8080 --name simple-node-api gerardinhoo/simple-node-api
+- Make sure port 80 is allowed in EC2 security group.
 
+---
 
+⚙️ CI/CD with GitHub Actions (SSH Deployment)
 
+# .github/workflows/deploy.yml
 
+name: Deploy to EC2 via SSH
 
+on:
+push:
+branches: - main
 
+jobs:
+deploy:
+runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@<your-ec2-public-ip> << 'EOF'
+            cd ~/Devops-Journey/simple-node-api
+            git pull origin main
+            docker stop simple-node-api || true
+            docker rm simple-node-api || true
+            docker rmi gerardinhoo/simple-node-api || true
+            docker pull gerardinhoo/simple-node-api
+            docker run -d -p 80:8080 --name simple-node-api gerardinhoo/simple-node-api
+          EOF
+
+---
+
+## 🧠 What I Learned
+
+- How to Dockerize a Node.js API
+
+- How to push Docker images to Docker Hub
+
+- How to deploy apps on EC2 with SSH
+
+- How to configure GitHub Actions for CI/CD
+
+- GCP firewall + VM setup (WIP)
+
+- How to expose services on a public IP
+
+---
+
+## ✅ Next Steps
+
+- Add monitoring with Prometheus + Grafana
+
+- Auto-deploy to GCP via Terraform
+
+- Add a /healthz endpoint and health check in CI/CD
+
+- Deploy to Kubernetes (GKE)
