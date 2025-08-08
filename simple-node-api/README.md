@@ -4,17 +4,17 @@ This is a simple Express-based Node.js API that responds with a welcome message.
 
 ---
 
-## 🔥 Live API Endpoint
+### 🔥 Live API Endpoint
 
 **GET /**
 
-### Response:
+#### Response:
 
 🚀 Hello from Gerard's Simple Node API!
 
 ---
 
-## 🛠 Tech Stack
+### 🛠 Tech Stack
 
 - Node.js + Express.js
 - Docker (image hosted on Docker Hub)
@@ -26,19 +26,19 @@ This is a simple Express-based Node.js API that responds with a welcome message.
 
 ---
 
-## 📸 Screenshots
+### 📸 Screenshots
 
-### ✅ Live public API from EC2
+#### ✅ Live public API from EC2
 
 ![Live public API response](./assets/ec2-browser.png)
 
-### ✅ GitHub Actions: CI/CD Workflow
+#### ✅ GitHub Actions: CI/CD Workflow
 
 ![GitHub Actions Deploy Job](./assets/github-actions.png)
 
 ---
 
-## 📁 Project Structure
+### 📁 Project Structure
 
 simple-node-api/
 ├── Dockerfile
@@ -48,7 +48,7 @@ simple-node-api/
 
 ---
 
-## 🐳 Dockerfile Overview
+### 🐳 Dockerfile Overview
 
 ```Dockerfile
 FROM node:18
@@ -63,38 +63,38 @@ CMD ["npm", "start"]
 
 ---
 
-## 🛠 Run Locally (Dev)
+### 🛠 Run Locally (Dev)
 
-# Clone the repo
+## Clone the repo
 
 - git clone https://github.com/gerardinhoo/simple-node-api.git
 - cd simple-node-api
 
-# Build Docker image
+## Build Docker image
 
 - docker build -t simple-node-api .
 
-# Run the container
+## Run the container
 
 - docker run -p 3000:8080 simple-node-api
 
-# Visit:
+## Visit:
 
 - http://localhost:3000
 
 ---
 
-## 🌍 Deploy to EC2 (Manually)
+### 🌍 Deploy to EC2 (Manually)
 
-# SSH into EC2 instance
+## SSH into EC2 instance
 
 - ssh -i ~/.ssh/your-key.pem ubuntu@<your-ec2-public-ip>
 
-# Pull image
+## Pull image
 
 - docker pull gerardinhoo/simple-node-api
 
-# Run container
+## Run container
 
 - docker run -d -p 80:8080 --name simple-node-api gerardinhoo/simple-node-api
 - Make sure port 80 is allowed in EC2 security group.
@@ -103,7 +103,7 @@ CMD ["npm", "start"]
 
 ⚙️ CI/CD with GitHub Actions (SSH Deployment)
 
-# .github/workflows/deploy.yml
+## .github/workflows/deploy.yml
 
 name: Deploy to EC2 via SSH
 
@@ -140,7 +140,7 @@ runs-on: ubuntu-latest
 
 ---
 
-## 📈 Monitoring with Prometheus + Grafana
+### 📈 Monitoring with Prometheus + Grafana
 
 This project includes a production-grade monitoring setup for the Simple Node API using:
 
@@ -161,7 +161,7 @@ This project includes a production-grade monitoring setup for the Simple Node AP
 | ------------------------------------ | ------------------------ | ------------------------------------------------------ |
 | ![Dashboard](./assets/dashboard.png) | ![App](./assets/app.png) | ![Prometheus Targets](./assets/prometheus-targets.png) |
 
-### 📂 Dashboard JSON
+#### 📂 Dashboard JSON
 
 To reuse or import the Grafana dashboard:
 
@@ -169,7 +169,7 @@ To reuse or import the Grafana dashboard:
 
 ---
 
-## ✅ Run the Monitoring Stack
+### ✅ Run the Monitoring Stack
 
 ```bash
 # Start app, Prometheus, and Grafana
@@ -187,7 +187,7 @@ docker-compose up -d
 
 ---
 
-## 🧠 What I Learned
+### 🧠 What I Learned
 
 - How to Dockerize a Node.js API
 
@@ -207,7 +207,7 @@ docker-compose up -d
 
 ---
 
-## ✅ Next Steps
+### ✅ Next Steps
 
 - Auto-deploy to GCP via Terraform
 
