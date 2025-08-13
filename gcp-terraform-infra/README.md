@@ -125,9 +125,6 @@ GCP-TERRAFORM-INFRA/
 
 
 ## 🏁 Next Steps
-
-- [x] Remote backend in GCS configured
-- [x] Terraform workspaces (dev/prod) setup
 - [ ] Monitoring via Stackdriver or Prometheus (GCP infra)
 - [ ] CI/CD with GitHub Actions for Terraform
 - [ ] Reusable modules refactor
