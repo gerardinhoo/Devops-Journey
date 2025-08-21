@@ -6,175 +6,130 @@ This project provisions and manages a complete infrastructure on **Google Cloud 
 
 ## ✅ What’s Been Done So Far
 
-### 1. 🔧 Terraform Files Created
+### 1. 📊 Architecture Diagram
 
-- **main.tf**: Core infrastructure setup (VPC, Subnet, Firewall, VM)
-- **variables.tf**: Input variables for flexibility and reuse
-- **terraform.tfvars**: Concrete values for the defined variables
-- **startup.sh**: Provisioning script to install Docker (or any other app) during VM startup
-- **outputs.tf**: Outputs to extract and display useful runtime data (external IPs, resource names, etc.)
+A high-level view of the infrastructure provisioning using Terraform and GCP:
+
+![Architecture Diagram](./assets/architecture-diagram.png)
 
 ---
 
-### 2. 🌐 Infrastructure Provisioned on GCP
+### 2. 🔧 Terraform Files Created
 
-- **VPC** and **Subnet** created with custom CIDR block
-- **Firewall** rule allowing SSH (TCP port 22)
-- **VM Instance** with:
-  - Boot disk (Ubuntu 22.04 LTS image)
-  - Public IP address
-  - SSH tag for firewall access
-  - Docker and Git installed via startup.sh during boot
-  - Verified via SSH (docker --version, git --version)
+#### Development Environment
 
----
+- **gcp-terraform-dev/main.tf**: Core infrastructure setup (VPC, Subnet, Firewall, VM)
+- **gcp-terraform-dev/variables.tf**: Input variables for flexibility and reuse
+- **gcp-terraform-dev/terraform.tfvars**: Concrete values for the defined variables
+- **gcp-terraform-dev/startup.sh**: Provisioning script to install Docker (or any other app) during VM startup
+- **gcp-terraform-dev/outputs.tf**: Outputs to extract and display useful runtime data
 
-### 3. 🖥️ SSH into VM
+#### Production Environment
 
-- Used `gcloud compute ssh` to connect to VM securely
-- Verified Docker was running inside the VM
-
----
-
-### 4. 📤 Outputs
-
-- External IP of VM
-- VM instance name
-- VPC and Subnet information
-
-This allows for:
-
-- Easier debugging and deployment references
-- Integration with CI/CD pipelines
+- **gcp-terraform-prod/main.tf**: Core infrastructure setup (VPC, Subnet, Firewall, VM)
+- **gcp-terraform-prod/variables.tf**: Input variables for flexibility and reuse
+- **gcp-terraform-prod/terraform.tfvars**: Concrete values for the defined variables
+- **gcp-terraform-prod/startup.sh**: Provisioning script to install Docker (or any other app) during VM startup
+- **gcp-terraform-prod/outputs.tf**: Outputs to extract and display useful runtime data
 
 ---
 
-### 5. 🌱 Environment Isolation with Workspaces
+### 3. 🌐 Infrastructure Provisioned on GCP
 
-We introduced Terraform workspaces to isolate deployments into distinct dev and prod environments.
+#### ✅ VPC and Subnet - Dev And Prod Environments
 
-Each environment provisions uniquely named resources by dynamically appending the workspace (dev, prod) to resource names.
+Created a custom VPC and subnet with defined IP ranges.
 
-🧠 Why Use Workspaces?
+##### ✅ Dev Environment
 
-| Feature               | Benefit                                                |
-| --------------------- | ------------------------------------------------------ |
-| Environment isolation | Separate resources for dev and prod with shared config |
-| Dynamic naming        | Automatically adds `-dev` or `-prod` to resource names |
-| Reduced duplication   | Avoids maintaining separate Terraform files per env    |
-| Easier testing        | Safely test changes in dev before promoting to prod    |
-
-🛠️ Setup Summary
-
-Resources dynamically named using terraform.workspace
-name = "${var.vm_name}-${terraform.workspace}"
-
-Each workspace writes its state to a separate prefix in a GCS backend:
-
-gs://devops-terraform-state-bucket-gerard-20250725/gcp-terraform/dev/terraform.tfstate
-gs://devops-terraform-state-bucket-gerard-20250725/gcp-terraform/prod/terraform.tfstate
-
-🚀 Commands to Use Workspaces
-
-### 6. List all available workspaces
-
-- terraform workspace list
-
-### 7. Create new workspaces (only once)
-
-- terraform workspace new dev
-- terraform workspace new prod
-
-### 8. Switch between them
-
-- terraform workspace select dev
-- terraform apply # Applies to dev environment
-
-- terraform workspace select prod
-- terraform apply # Applies to prod environment
-
-✅ Deployment Verified
-
-Both environments were successfully applied and tested with the following outputs:
-
-**Dev Output**:
-
-- vm_name = "devops-vm-dev"
-- vm_external_ip = "34.133.136.20"
-
-**Prod Output**:
-
-- vm_name = "devops-vm-prod"
-- vm_external_ip = "34.63.125.105"
-
-### 🔍 Why These Steps Matter
-
-| Step                     | Purpose                                                               |
-| ------------------------ | --------------------------------------------------------------------- |
-| **Terraform IaC**        | Declaratively and reproducibly manage infrastructure                  |
-| **Startup Script**       | Automatically configure VMs on boot (e.g., install Docker, git)       |
-| **Outputs**              | Feed key data into pipelines or dashboards (IP, resource names, etc.) |
-| **SSH Access**           | Verify and troubleshoot VM directly                                   |
-| **Terraform Lock File**  | Ensure consistent provider versions across environments               |
-| **Terraform Workspaces** | Isolate environments like `dev` and `prod` using dynamic naming       |
+![VPC + Subnet Dev](./assets/vpc-subnet-dev.png)
 
 ---
 
-## ⏭️ What’s Next
+##### ✅ Prod Environment
 
-We will now:
-
-- ✅ Store `terraform.tfstate` in a GCS bucket (remote backend) - Done
-- ✅ Add Terraform workspaces for `dev` and `prod` - Done
-
-* - 📦 Refactor into reusable Terraform modules (VPC, Compute, Firewall)
-
-- 📈 Enable monitoring/logging with Stackdriver (and optionally Prometheus)
-
-* - 🛠️ Set up CI/CD with GitHub Actions (Terraform plan/apply)
-* - 🧪 Add `tflint` and `terraform validate` checks
-* - 🔐 Explore secrets management (Vault or GCP Secret Manager)
+![VPC + Subnet Prod](./assets/vpc-subnet-prod.png)
 
 ---
 
-## 📁 Project Structure
+#### ✅ Firewall Rule
+
+Allowing inbound HTTP and SSH access via TCP 80 and 22.
+
+![Firewall Rule](./assets/firewall-rule.png)
+
+---
+
+#### ✅ VM Instances for Dev & Prod Workspaces
+
+Terraform workspaces were used to deploy two separate VM instances.
+
+![VM Instances](./assets/vm-list.png)
+
+---
+
+### 4. 🖥️ SSH Verification & Software Installation
+
+- Connected to VM via `gcloud compute ssh`
+- Verified Docker and Git installed using startup script
+
+![SSH Verification](./assets/ssh-verification.png)
+
+---
+
+### 5. 🌱 Terraform Workspaces: `dev` and `prod`
+
+Resources were dynamically named and isolated per environment:
+
+| Feature               | Benefit                                         |
+| --------------------- | ----------------------------------------------- |
+| Environment isolation | Separate `dev` and `prod` resources             |
+| Dynamic naming        | `-dev` and `-prod` suffixes added automatically |
+| GCS remote backend    | Each workspace has isolated tfstate in GCS      |
+
+> Example:
+
+- `devops-vm-dev`, `devops-vpc-dev`, `devops-subnet-dev`
+- `devops-vm-prod`, `devops-vpc-prod`, `devops-subnet-prod`
+
+---
+
+### 6. ✅ Outputs Used
+
+- External IPs, VM names, and other identifiers used for debugging and CI/CD
+
+---
+
+## 7. 📁 Project Structure
 
 ```plaintext
-gcp-terraform-infra/
-├── main.tf
-├── variables.tf
-├── terraform.tfvars
-├── outputs.tf
-├── startup.sh
+GCP-TERRAFORM-INFRA/
+├── assets/
+│   └── architecture-diagram.png
+├── gcp-terraform-dev/
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── startup.sh
+│   ├── terraform.tfvars
+│   └── variables.tf
+├── gcp-terraform-prod/
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── startup.sh
+│   ├── terraform.tfvars
+│   └── variables.tf
+├── README.md
 └── .terraform.lock.hcl
+
+
+## 🏁 Next Steps
+- [ ] Monitoring via Stackdriver or Prometheus (GCP infra)
+- [ ] CI/CD with GitHub Actions for Terraform
+- [ ] Reusable modules refactor
+- [ ] Secrets management via Vault or GCP Secrets Manager
+
+---
+
 ```
-
----
-
-### 📌 Note
-
-All work is version-controlled and committed as milestones are completed. This README tracks major infrastructure setup before CI/CD integration begins.
-
----
-
-### 🏷️ Versioning
-
-This milestone was tagged as:  
-`v0.1.0 - Initial environment setup with dev/prod workspaces`
-
-### 🧪 VM Setup Verification (August 5, 2025)
-
-Successfully provisioned a Dev VM (`devops-vm-dev`) with:
-
-- Ubuntu 22.04 LTS base image
-- Docker and Git installed using a `startup.sh` script
-- Verified:
-  - Docker version 27.5.1
-  - Git version 2.34.1
-  - GitHub repo (`Devops-Journey`) cloned successfully
-- SSH login tested using:
-  ```bash
-  ssh gcp-devops
-  ```
-
-🗓️ Last Updated: August 05, 2025
