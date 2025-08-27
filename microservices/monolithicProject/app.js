@@ -66,7 +66,7 @@ app.get('/api/users/:id', (req, res) => {
   const user = findUserById(req.params.id);
 
   if (!user) {
-    return res.status(400).json({ error: 'No User found' });
+    return res.status(404).json({ error: 'No User found' });
   }
   res.json(user);
 });
@@ -75,7 +75,7 @@ app.get('/api/users/:id', (req, res) => {
 app.get('/api/orders', (req, res) => {
   const userOrder = orders.map((order) => ({
     ...order,
-    user: findUserById(order.userId) || { name: 'unknown' },
+    user: findUserById(order.userId) || { fullName: 'unknown' },
   }));
   res.json(userOrder);
 });
