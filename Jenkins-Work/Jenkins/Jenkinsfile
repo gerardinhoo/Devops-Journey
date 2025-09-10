@@ -1,28 +1,47 @@
 pipeline {
-   agent any
-   environment {APP = 'jenkins-express'}
-   stages {
-      stage('Checkout')  { steps { checkout scm } }
-      stage('Install & Test') { steps { sh 'npm ci && npm test' } }
-      stage('Build Image') {
-         steps {
-            sh '''
-                 docker build -t ${APP}:${BUILD_NUMBER} .
-                 docker tag ${APP}:${BUILD_NUMBER} ${APP}:latest
-               '''
-         }
+  agent any
+  options { skipDefaultCheckout(true) }
+
+  environment {
+    IMAGE = "jenkins-express:${env.BUILD_NUMBER}"
+    DOCKER_BUILDKIT = "1"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
       }
-      stage('Run Container') {
-         steps {
-            sh '''
-                 docker ps -q --filter name=${APP} | xargs -r docker rm -f 
-                 docker run -d --name ${APP} -p 3000:3000 ${APP}:latest
-               '''
-         }
+    }
+
+    stage('Build Image') {
+      steps {
+        // Dockerfile is in Jenkins-Work/Jenkins
+        dir('Jenkins-Work/Jenkins') {
+          sh 'docker build -t $IMAGE .'
+        }
       }
-   }
-   post {
-      always {sh 'docker image prune -f || true'}
-      success {echo 'Up at http://3.150.94.17:3000'}
-   }
+    }
+
+    stage('Run Container (smoke test)') {
+      steps {
+        sh '''
+          docker rm -f jx || true
+          docker run -d --name jx -p 3000:3000 $IMAGE
+          # tiny wait + health check
+          sleep 3
+          curl -fsS http://localhost:3000/health
+        '''
+      }
+    }
+  }
+
+  post {
+    always {
+      sh '''
+        docker rm -f jx || true
+        docker image prune -f || true
+      '''
+    }
+  }
 }
