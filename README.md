@@ -100,6 +100,45 @@ Includes:
 
 ➡️ Detailed README inside: [`simple-node-api/README.md`](./simple-node-api/README.md)
 
+---
+
+### 🐍 Simple Flask App — Dockerized
+
+Path: [`docker-python-flask/`](./docker-python-flask)
+
+A tiny Flask app in Docker. Comes with **Dockerfile** and **Compose (dev/prod)**; optional EC2 deploy.
+
+Quickstart:
+
+```bash
+# Basic Docker
+cd docker-python-flask
+docker build -t flask-app .
+docker run -d -p 5000:5000 flask-app
+# open http://localhost:5000
+```
+
+---
+
+### 🧩 Microservices Learning Track (Monolith → Microservices)
+
+A hands-on comparison of architectures using the tiny **ShopLite** domain (Users & Orders).
+
+- **Monolith:** [`microservices/monolithicProject`](./microservices/monolithicProject) — single-process Node/Express app.
+- **Microservices:** [`microservices/microservicesProject`](./microservices/microservicesProject) — split into `users-svc` and `orders-svc` wired with Docker Compose.
+
+Quickstart:
+
+```bash
+# Monolith
+cd microservices/monolithicProject && npm i && npm run dev
+
+# Microservices
+cd microservices/microservicesProject && docker compose up --build
+```
+
+---
+
 ## 🧠 About
 
 This repository serves as a personal DevOps lab to:
@@ -112,20 +151,28 @@ This repository serves as a personal DevOps lab to:
 
 ## 📌 What's next?
 
-As I continue learning, this repo will grow to include:
+This DevOps Journey is just getting started. Progress tracker:
 
-This DevOps Journey is just getting started. Here's what's coming up:
+### ✅ Completed
 
-- ✅ Dockerized Node.js app with custom image hosted on Docker Hub
-- ✅ Manual EC2 deployment using SSH
-- ✅ CI/CD pipeline using GitHub Actions
-- 🚀 Monitoring with Prometheus + Grafana
-- ☁️ GCP deployment using Terraform (WIP)
-- 🔁 Health checks and auto-restarts via CI/CD
-- 🐳 Multi-container orchestration with Docker Compose
-- ☸️ Kubernetes deployment to GKE
-- 📈 Log aggregation and metrics tracking
-- 🛡️ Secrets management and environment hardening
+- Dockerized Node.js app with custom image hosted on Docker Hub
+- Manual EC2 deployment using SSH
+- CI/CD pipeline using GitHub Actions (build/push and deploy)
+- Multi-container orchestration with Docker Compose (users-svc + orders-svc)
+- Dockerized Flask app (dev/prod Compose; optional EC2 deploy)
+
+### 🚧 In progress
+
+- GCP deployment using Terraform (WIP)
+- Health checks & readiness (Compose + services) and basic auto-restarts
+
+### 🎯 Planned
+
+- Monitoring with Prometheus + Grafana
+- Jenkins pipeline (CI) alongside GitHub Actions
+- Kubernetes deployment to GKE
+- Log aggregation & metrics (e.g., EFK/ELK, OpenTelemetry)
+- Secrets management and environment hardening
 
 Stay tuned as this repo evolves into a full-scale DevOps showcase.
 
