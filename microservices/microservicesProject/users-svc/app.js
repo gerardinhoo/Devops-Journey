@@ -11,7 +11,7 @@ const users = [
   { id: 'u3', fullName: 'Sanctus E' },
 ];
 
-app.get('/heatlhz', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ ok: 'true' });
 });
 
@@ -25,7 +25,7 @@ app.get('/users', (req, res) => {
   return res.json(users);
 });
 
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 3001;
 const server = app.listen(port, () => console.log(`users-svc on ${port}`));
 const shutdown = () => server.close(() => process.exit(0));
 process.on('SIGTERM', shutdown);

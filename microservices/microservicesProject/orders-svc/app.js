@@ -24,7 +24,7 @@ async function fetchWithTimeout(url, ms = 2000) {
   }
 }
 
-app.get('/healthz', (_req, res) => res.json({ ok: true }));
+app.get('/health', (_req, res) => res.json({ ok: true }));
 
 // list orders, enriched with user info from users-svc
 app.get('/orders', async (_req, res) => {
