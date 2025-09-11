@@ -38,18 +38,20 @@ pipeline {
 
   post {
     success {
-      slackSend {
+      slackSend (
          channel: '#all-gerard-eklu-the-dev',
          color: 'good',
-         message: '✅ SUCCESS: Build #${env.BUILD_NUMBER} for ${env.JOB_NAME}'
-      }
+         message: "✅ SUCCESS: Build #${env.BUILD_NUMBER} for ${env.JOB_NAME}"
+      )     
     }
     failure {
-      slackSend {
+       slackSend (
         channel: '#all-gerard-eklu-the-dev',
         color: 'danger',
         message: "❌ FAILED: Build #${env.BUILD_NUMBER} for ${env.JOB_NAME}"
-      }   
-    }
-  }
+      )
+    }    
+  }   
 }
+
+
