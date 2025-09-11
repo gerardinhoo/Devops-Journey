@@ -37,11 +37,17 @@ pipeline {
   }
 
   post {
-    always {
-      sh '''
-        docker rm -f jx || true
-        docker image prune -f || true
-      '''
+    success {
+      slackSend {
+         channel: '#all-gerard-eklu-the-dev',
+         color: 'good',
+         message: '✅ SUCCESS: Build #${env.BUILD_NUMBER} for ${env.JOB_NAME}'
+      }
+    }
+    failure {
+      channel: '#all-gerard-eklu-the-dev',
+      color: 'danger',
+      message: "❌ FAILED: Build #${env.BUILD_NUMBER} for ${env.JOB_NAME}"
     }
   }
 }
