@@ -45,9 +45,11 @@ pipeline {
       }
     }
     failure {
-      channel: '#all-gerard-eklu-the-dev',
-      color: 'danger',
-      message: "❌ FAILED: Build #${env.BUILD_NUMBER} for ${env.JOB_NAME}"
+      slackSend {
+        channel: '#all-gerard-eklu-the-dev',
+        color: 'danger',
+        message: "❌ FAILED: Build #${env.BUILD_NUMBER} for ${env.JOB_NAME}"
+      }   
     }
   }
 }
