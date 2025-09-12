@@ -57,7 +57,7 @@
         <version>${jetty.plugin.version}</version>
         <configuration>
           <httpConnector>
-            <port>8080</port>
+            <port>8082</port>
           </httpConnector>
           <scanIntervalSeconds>2</scanIntervalSeconds>
           <webApp>
