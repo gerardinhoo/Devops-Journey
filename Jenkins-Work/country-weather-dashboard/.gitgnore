@@ -1,0 +1,20 @@
+# Maven
+
+target/
+_.class
+_.log
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE/editor
+
+.idea/
+.vscode/
+\*.iml
+.classpath
+.project
+.settings/
+
+# OS noise
+
+.DS_Store
+Thumbs.db
