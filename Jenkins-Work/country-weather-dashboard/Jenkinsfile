@@ -2,6 +2,11 @@ pipeline {
   agent any
   options { timestamps() }
 
+  tools {
+    jdk   'jdk17'
+    maven 'maven-3.9'
+  }
+
   parameters {
     booleanParam(name: 'RUN_SONAR',  defaultValue: false, description: 'Run SonarQube analysis')
     booleanParam(name: 'RUN_TRIVY',  defaultValue: true,  description: 'Scan image with Trivy')
@@ -10,22 +15,26 @@ pipeline {
   }
 
   environment {
-    JAVA_HOME  = tool name: 'jdk17', type: 'jdk'
-    MAVEN_HOME = tool name: 'maven-3.9', type: 'maven'
-    PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin}:${env.PATH}"
-
     APP       = 'country-weather'
-    IMAGE     = 'ge/country-weather'      
+    IMAGE     = 'ge/country-weather'   // change to your Docker Hub repo if needed
     COMMIT    = "${env.GIT_COMMIT ?: 'local'}"
     IMG_TAG   = "${env.BUILD_NUMBER}-${COMMIT.take(7)}"
-    HOST_PORT = '8082'                      // host port (Jenkins is on 8080)
-    CONT_PORT = '8080'                      // Tomcat internal port
+    HOST_PORT = '8082'                 // host port (Jenkins uses 8080)
+    CONT_PORT = '8080'                 // Tomcat internal port
     WORKDIR   = 'Jenkins-Work/country-weather-dashboard'
   }
 
   stages {
     stage('Checkout') {
       steps { checkout scm }
+    }
+
+    stage('Tool Versions') {
+      steps {
+        sh 'java -version'
+        sh 'mvn -version'
+        sh 'docker --version || true'
+      }
     }
 
     stage('Build & Unit Test') {
@@ -62,7 +71,7 @@ pipeline {
       }
     }
 
-    stage('SonarQube') {
+    stage('SonarQube (optional)') {
       when { expression { return params.RUN_SONAR } }
       steps {
         dir("${WORKDIR}") {
@@ -90,18 +99,18 @@ pipeline {
       }
     }
 
-    stage('Trivy Scan') {
+    stage('Trivy Scan (optional)') {
       when { expression { return params.RUN_TRIVY } }
       steps {
-        sh '''
+        sh """
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
             aquasec/trivy:latest image --no-progress --exit-code 1 \
-            --severity HIGH,CRITICAL '"'"'${IMAGE}:${IMG_TAG}'"'"'
-        '''
+            --severity HIGH,CRITICAL ${IMAGE}:${IMG_TAG}
+        """
       }
     }
 
-    stage('Push Image') {
+    stage('Push Image (optional)') {
       when { expression { return params.PUSH_IMAGE } }
       steps {
         withCredentials([usernamePassword(credentialsId: 'registry-creds', usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
@@ -130,7 +139,7 @@ pipeline {
     success {
       script {
         try {
-          slackSend channel: '#all-gerard-eklu-the-dev',
+          slackSend channel: '#ci-cd',
             message: "✅ ${env.JOB_NAME} #${env.BUILD_NUMBER} OK — ${env.BUILD_URL} (${IMAGE}:${IMG_TAG})"
         } catch (e) { echo 'Slack not configured; skipping.' }
       }
@@ -138,7 +147,7 @@ pipeline {
     failure {
       script {
         try {
-          slackSend channel: '#all-gerard-eklu-the-dev',
+          slackSend channel: '#ci-cd',
             message: "❌ ${env.JOB_NAME} #${env.BUILD_NUMBER} FAILED — ${env.BUILD_URL}"
         } catch (e) { echo 'Slack not configured; skipping.' }
       }
