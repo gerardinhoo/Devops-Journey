@@ -1,0 +1,130 @@
+pipeline {
+  agent any
+  options { timestamps(); ansiColor('xterm') }
+
+  parameters {
+    booleanParam(name: 'RUN_SONAR',  defaultValue: false, description: 'Run SonarQube analysis')
+    booleanParam(name: 'RUN_TRIVY',  defaultValue: true,  description: 'Scan image with Trivy')
+    booleanParam(name: 'PUSH_IMAGE', defaultValue: false, description: 'Push image to registry')
+    booleanParam(name: 'DEPLOY',     defaultValue: true,  description: 'Deploy container on this node')
+  }
+
+  environment {
+    // Jenkins > Manage Jenkins > Tools
+    JAVA_HOME  = tool name: 'jdk17', type: 'jdk'
+    MAVEN_HOME = tool name: 'maven-3.9', type: 'maven'
+    PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+
+    // Image naming
+    APP     = 'country-weather'
+    IMAGE   = 'ge/country-weather' 
+    COMMIT  = "${env.GIT_COMMIT ?: 'local'}"
+    IMG_TAG = "${env.BUILD_NUMBER}-${COMMIT.take(7)}"
+    HOST_PORT = '8082'   // Jenkins uses 8080, so expose app on 8082
+    CONT_PORT = '8080'   // Tomcat internal port
+  }
+
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
+    stage('Build & Unit Test') {
+      steps { sh 'mvn -B -e clean verify' }
+      post { always { junit 'target/surefire-reports/*.xml' } }
+    }
+
+    stage('Package WAR') {
+      steps { sh 'mvn -B -DskipTests package' }
+    }
+
+    stage('Build Image') {
+      steps {
+        sh """
+          docker build -t ${IMAGE}:${IMG_TAG} -t ${IMAGE}:latest .
+          docker images | head -n 10
+        """
+      }
+    }
+
+    stage('SonarQube') {
+      when { expression { return params.RUN_SONAR } }
+      steps {
+        withSonarQubeEnv('SonarQubeServer') {
+          withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+            sh '''
+              mvn -B sonar:sonar \
+                -Dsonar.login=$SONAR_TOKEN \
+                -Dsonar.projectKey=country-weather-dashboard \
+                -Dsonar.projectName=country-weather-dashboard \
+                -Dsonar.java.binaries=target/classes
+            '''
+          }
+        }
+      }
+    }
+
+    stage('Quality Gate') {
+      when { expression { return params.RUN_SONAR } }
+      steps {
+        timeout(time: 5, unit: 'MINUTES') {
+          waitForQualityGate abortPipeline: true
+        }
+      }
+    }
+
+    stage('Trivy Scan') {
+      when { expression { return params.RUN_TRIVY } }
+      steps {
+        sh '''
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image --no-progress --exit-code 1 \
+            --severity HIGH,CRITICAL ${IMAGE}:${IMG_TAG}
+        '''
+      }
+    }
+
+    stage('Push Image') {
+      when { expression { return params.PUSH_IMAGE } }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'registry-creds', usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
+          sh """
+            echo "$REG_PASS" | docker login -u "$REG_USER" --password-stdin
+            docker push ${IMAGE}:${IMG_TAG}
+            docker push ${IMAGE}:latest
+          """
+        }
+      }
+    }
+
+    stage('Deploy (Dockerized Tomcat)') {
+      when { expression { return params.DEPLOY } }
+      steps {
+        sh """
+          docker rm -f ${APP} || true
+          docker run -d --name ${APP} --restart unless-stopped \
+            -p ${HOST_PORT}:${CONT_PORT} ${IMAGE}:${IMG_TAG}
+        """
+      }
+    }
+  }
+
+  post {
+    success {
+      script {
+        try {
+          slackSend channel: '#all-gerard-eklu-the-dev',
+            message: "✅ ${env.JOB_NAME} #${env.BUILD_NUMBER} OK — ${env.BUILD_URL} (${IMAGE}:${IMG_TAG})"
+        } catch (e) { echo 'Slack not configured; skipping.' }
+      }
+    }
+    failure {
+      script {
+        try {
+          slackSend channel: '#all-gerard-eklu-the-dev',
+            message: "❌ ${env.JOB_NAME} #${env.BUILD_NUMBER} FAILED — ${env.BUILD_URL}"
+        } catch (e) { echo 'Slack not configured; skipping.' }
+      }
+    }
+  }
+}
