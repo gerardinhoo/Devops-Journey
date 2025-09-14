@@ -71,48 +71,72 @@ pipeline {
       steps { timeout(time: 5, unit: 'MINUTES') { waitForQualityGate abortPipeline: true } }
     }
 
-    stage('Publish to Nexus (mvn deploy)') {
+   stage('Publish to Nexus (mvn deploy)') {
       steps {
-        dir("${WORKDIR}") {
-          withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-            sh '''
-              cat > .mvn-settings-nexus.xml <<EOF
-              <settings>
-                <mirrors>
-                  <mirror><id>nexus</id><mirrorOf>*</mirrorOf><url>'"${NEXUS_PUBLIC}"'</url></mirror>
-                </mirrors>
-                <servers>
-                  <server><id>nexus-releases</id><username>'"${NEXUS_USER}"'</username><password>'"${NEXUS_PASS}"'</password></server>
-                  <server><id>nexus-snapshots</id><username>'"${NEXUS_USER}"'</username><password>'"${NEXUS_PASS}"'</password></server>
-                </servers>
-              </settings>
-              EOF
-              mvn -s .mvn-settings-nexus.xml -B -DskipTests deploy
-            '''
-          }
-        }
-      }
-    }
+         dir("${WORKDIR}") {
+            withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+            sh(script: '''
+               set -e
+               cat > .mvn-settings-nexus.xml <<EOF
+               <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                  <mirrors>
+                  <mirror>
+                     <id>nexus</id>
+                     <mirrorOf>*</mirrorOf>
+                     <url>${NEXUS_PUBLIC}</url>
+                  </mirror>
+                  </mirrors>
+                  <servers>
+                  <server>
+                     <id>nexus-releases</id>
+                     <username>${NEXUS_USER}</username>
+                     <password>${NEXUS_PASS}</password>
+                  </server>
+                  <server>
+                     <id>nexus-snapshots</id>
+                     <username>${NEXUS_USER}</username>
+                     <password>${NEXUS_PASS}</password>
+                  </server>
+                  </servers>
+               </settings>
+               EOF
 
-    stage('Pull WAR from Nexus (use released artifact)') {
-      steps {
-        dir("${WORKDIR}") {
-          withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-            sh '''
-              VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
-              mvn -s .mvn-settings-nexus.xml -B dependency:get \
-                -DremoteRepositories="${NEXUS_RELEASES},${NEXUS_SNAPSHOTS}" \
-                -Dartifact=com.ge.dashboard:country-weather-dashboard:${VERSION}:war \
-                -Dtransitive=false
-              LOCAL_REPO=$(mvn -q -DforceStdout help:evaluate -Dexpression=settings.localRepository)
-              SRC="$LOCAL_REPO/com/ge/dashboard/country-weather-dashboard/${VERSION}/country-weather-dashboard-${VERSION}.war"
-              mkdir -p target && cp "$SRC" target/country-weather-dashboard.war
-              ls -lh target/country-weather-dashboard.war
-            '''
-          }
-        }
+               # sanity check
+               sed -n '1,200p' .mvn-settings-nexus.xml
+
+               mvn -s .mvn-settings-nexus.xml -B -DskipTests deploy
+            '''.stripIndent())
+            }
+         }
       }
-    }
+   }
+
+
+   stage('Pull WAR from Nexus (use released artifact)') {
+      steps {
+         dir("${WORKDIR}") {
+            withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+            sh(script: '''
+               set -e
+               VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+
+               mvn -s .mvn-settings-nexus.xml -B dependency:get \
+                  -DremoteRepositories="${NEXUS_RELEASES},${NEXUS_SNAPSHOTS}" \
+                  -Dartifact=com.ge.dashboard:country-weather-dashboard:${VERSION}:war \
+                  -Dtransitive=false
+
+               LOCAL_REPO=$(mvn -q -DforceStdout help:evaluate -Dexpression=settings.localRepository)
+               SRC="$LOCAL_REPO/com/ge/dashboard/country-weather-dashboard/${VERSION}/country-weather-dashboard-${VERSION}.war"
+               mkdir -p target && cp "$SRC" target/country-weather-dashboard.war
+               ls -lh target/country-weather-dashboard.war
+            '''.stripIndent())
+            }
+         }
+      }
+}
+
 
     stage('Build Image (from Nexus WAR)') {
       steps {
