@@ -16,18 +16,23 @@ pipeline {
 
   environment {
     APP       = 'country-weather'
-    IMAGE     = 'gerardinhoo/country-weather-dashboard'
+    IMAGE     = 'gerardinhoo/country-weather-dashboard'   // set to your registry repo if pushing
     COMMIT    = "${env.GIT_COMMIT ?: 'local'}"
     IMG_TAG   = "${env.BUILD_NUMBER}-${COMMIT.take(7)}"
-    HOST_PORT = '8082'                 // host port (Jenkins uses 8080)
-    CONT_PORT = '8080'                 // Tomcat internal port
+    HOST_PORT = '8082'          // Jenkins uses 8080
+    CONT_PORT = '8080'          // Tomcat inside container
     WORKDIR   = 'Jenkins-Work/country-weather-dashboard'
+
+    // Nexus
+    NEXUS_BASE      = 'http://3.150.94.17:8081'
+    NEXUS_RELEASES  = "${NEXUS_BASE}/repository/maven-releases"
+    NEXUS_SNAPSHOTS = "${NEXUS_BASE}/repository/maven-snapshots"
+    NEXUS_PUBLIC    = "${NEXUS_BASE}/repository/maven-public"
   }
 
   stages {
-    stage('Checkout') {
-      steps { checkout scm }
-    }
+
+    stage('Checkout') { steps { checkout scm } }
 
     stage('Tool Versions') {
       steps {
@@ -38,37 +43,8 @@ pipeline {
     }
 
     stage('Build & Unit Test') {
-      steps {
-        dir("${WORKDIR}") {
-          sh 'mvn -B -e clean verify'
-        }
-      }
-      post {
-        always {
-          dir("${WORKDIR}") {
-            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
-          }
-        }
-      }
-    }
-
-    stage('Package WAR') {
-      steps {
-        dir("${WORKDIR}") {
-          sh 'mvn -B -DskipTests package'
-        }
-      }
-    }
-
-    stage('Build Image') {
-      steps {
-        dir("${WORKDIR}") {
-          sh """
-            docker build -t ${IMAGE}:${IMG_TAG} -t ${IMAGE}:latest .
-            docker images | head -n 10
-          """
-        }
-      }
+      steps { dir("${WORKDIR}") { sh 'mvn -B -e clean verify' } }
+      post { always { dir("${WORKDIR}") { junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml' } } }
     }
 
     stage('SonarQube') {
@@ -92,9 +68,59 @@ pipeline {
 
     stage('Quality Gate') {
       when { expression { return params.RUN_SONAR } }
+      steps { timeout(time: 5, unit: 'MINUTES') { waitForQualityGate abortPipeline: true } }
+    }
+
+    stage('Publish to Nexus (mvn deploy)') {
       steps {
-        timeout(time: 5, unit: 'MINUTES') {
-          waitForQualityGate abortPipeline: true
+        dir("${WORKDIR}") {
+          withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+            sh '''
+              cat > .mvn-settings-nexus.xml <<EOF
+              <settings>
+                <mirrors>
+                  <mirror><id>nexus</id><mirrorOf>*</mirrorOf><url>'"${NEXUS_PUBLIC}"'</url></mirror>
+                </mirrors>
+                <servers>
+                  <server><id>nexus-releases</id><username>'"${NEXUS_USER}"'</username><password>'"${NEXUS_PASS}"'</password></server>
+                  <server><id>nexus-snapshots</id><username>'"${NEXUS_USER}"'</username><password>'"${NEXUS_PASS}"'</password></server>
+                </servers>
+              </settings>
+              EOF
+              mvn -s .mvn-settings-nexus.xml -B -DskipTests deploy
+            '''
+          }
+        }
+      }
+    }
+
+    stage('Pull WAR from Nexus (use released artifact)') {
+      steps {
+        dir("${WORKDIR}") {
+          withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+            sh '''
+              VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+              mvn -s .mvn-settings-nexus.xml -B dependency:get \
+                -DremoteRepositories="${NEXUS_RELEASES},${NEXUS_SNAPSHOTS}" \
+                -Dartifact=com.ge.dashboard:country-weather-dashboard:${VERSION}:war \
+                -Dtransitive=false
+              LOCAL_REPO=$(mvn -q -DforceStdout help:evaluate -Dexpression=settings.localRepository)
+              SRC="$LOCAL_REPO/com/ge/dashboard/country-weather-dashboard/${VERSION}/country-weather-dashboard-${VERSION}.war"
+              mkdir -p target && cp "$SRC" target/country-weather-dashboard.war
+              ls -lh target/country-weather-dashboard.war
+            '''
+          }
+        }
+      }
+    }
+
+    stage('Build Image (from Nexus WAR)') {
+      steps {
+        dir("${WORKDIR}") {
+          sh """
+            docker build -t ${IMAGE}:${IMG_TAG} -t ${IMAGE}:latest .
+            docker images | head -n 10
+          """
         }
       }
     }
@@ -137,16 +163,15 @@ pipeline {
     stage('Smoke Test') {
       steps {
         sh '''
-         for i in $(seq 1 30); do
-         code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8082/ || true)
-         [ "$code" = "200" ] && break
-         sleep 2
-         done
-         curl -sSf "http://localhost:8082/search?q=Ghana" | grep -qi "Ghana"
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8082/ || true)
+            [ "$code" = "200" ] && break
+            sleep 2
+          done
+          curl -sSf "http://localhost:8082/search?q=Ghana" | grep -qi "Ghana"
         '''
-   }
- }
-
+      }
+    }
   }
 
   post {
@@ -154,7 +179,7 @@ pipeline {
       script {
         try {
           slackSend channel: '#all-gerard-eklu-the-dev',
-            message: "✅ ${env.JOB_NAME} #${env.BUILD_NUMBER} OK — ${env.BUILD_URL} (${IMAGE}:${IMG_TAG})"
+            message: "✅ ${env.JOB_NAME} #${env.BUILD_NUMBER} OK — ${env.BUILD_URL} (${env.IMAGE}:${env.IMG_TAG})"
         } catch (e) { echo 'Slack not configured; skipping.' }
       }
     }
