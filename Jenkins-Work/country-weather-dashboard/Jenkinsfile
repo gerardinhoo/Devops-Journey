@@ -71,47 +71,45 @@ pipeline {
       steps { timeout(time: 5, unit: 'MINUTES') { waitForQualityGate abortPipeline: true } }
     }
 
-   stage('Publish to Nexus (mvn deploy)') {
+  stage('Publish to Nexus (mvn deploy)') {
       steps {
          dir("${WORKDIR}") {
             withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-            sh(script: '''
-               set -e
-               cat > .mvn-settings-nexus.xml <<EOF
-               <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                        xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-                  <mirrors>
-                  <mirror>
-                     <id>nexus</id>
-                     <mirrorOf>*</mirrorOf>
-                     <url>${NEXUS_PUBLIC}</url>
-                  </mirror>
-                  </mirrors>
-                  <servers>
-                  <server>
-                     <id>nexus-releases</id>
-                     <username>${NEXUS_USER}</username>
-                     <password>${NEXUS_PASS}</password>
-                  </server>
-                  <server>
-                     <id>nexus-snapshots</id>
-                     <username>${NEXUS_USER}</username>
-                     <password>${NEXUS_PASS}</password>
-                  </server>
-                  </servers>
-               </settings>
-               EOF
-
-               # sanity check
-               sed -n '1,200p' .mvn-settings-nexus.xml
-
-               mvn -s .mvn-settings-nexus.xml -B -DskipTests deploy
-            '''.stripIndent())
+            script {
+               writeFile file: '.mvn-settings-nexus.xml', text: """
+      <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+      <mirrors>
+         <mirror>
+            <id>nexus</id>
+            <mirrorOf>*</mirrorOf>
+            <url>${env.NEXUS_PUBLIC}</url>
+         </mirror>
+      </mirrors>
+      <servers>
+         <server>
+            <id>nexus-releases</id>
+            <username>${env.NEXUS_USER}</username>
+            <password>${env.NEXUS_PASS}</password>
+         </server>
+         <server>
+            <id>nexus-snapshots</id>
+            <username>${env.NEXUS_USER}</username>
+            <password>${env.NEXUS_PASS}</password>
+         </server>
+      </servers>
+      </settings>
+      """
+            }
+            // sanity check (first and last lines)
+            sh 'head -n 3 .mvn-settings-nexus.xml && tail -n 3 .mvn-settings-nexus.xml'
+            sh 'mvn -s .mvn-settings-nexus.xml -B -DskipTests deploy'
             }
          }
       }
-   }
+}
+
 
 
    stage('Pull WAR from Nexus (use released artifact)') {
