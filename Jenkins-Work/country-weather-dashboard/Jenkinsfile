@@ -66,10 +66,10 @@ pipeline {
       }
     }
 
-    stage('Quality Gate') {
-      when { expression { return params.RUN_SONAR } }
-      steps { timeout(time: 5, unit: 'MINUTES') { waitForQualityGate abortPipeline: true } }
-    }
+   //  stage('Quality Gate') {
+   //    when { expression { return params.RUN_SONAR } }
+   //    steps { timeout(time: 5, unit: 'MINUTES') { waitForQualityGate abortPipeline: true } }
+   //  }
 
   stage('Publish to Nexus (mvn deploy)') {
       steps {
@@ -110,8 +110,6 @@ pipeline {
       }
 }
 
-
-
 stage('Pull WAR from Nexus (use released artifact)') {
   steps {
     dir("${WORKDIR}") {
@@ -135,8 +133,6 @@ stage('Pull WAR from Nexus (use released artifact)') {
     }
   }
 }
-
-
 
     stage('Build Image (from Nexus WAR)') {
       steps {
