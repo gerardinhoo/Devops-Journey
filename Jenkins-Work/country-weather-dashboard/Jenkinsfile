@@ -10,18 +10,17 @@ pipeline {
   }
 
   environment {
-    // Jenkins > Manage Jenkins > Tools
     JAVA_HOME  = tool name: 'jdk17', type: 'jdk'
     MAVEN_HOME = tool name: 'maven-3.9', type: 'maven'
-    PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+    PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin}:${env.PATH}"
 
-    // Image naming
-    APP     = 'country-weather'
-    IMAGE   = 'ge/country-weather' 
-    COMMIT  = "${env.GIT_COMMIT ?: 'local'}"
-    IMG_TAG = "${env.BUILD_NUMBER}-${COMMIT.take(7)}"
-    HOST_PORT = '8082'   // Jenkins uses 8080, so expose app on 8082
-    CONT_PORT = '8080'   // Tomcat internal port
+    APP       = 'country-weather'
+    IMAGE     = 'ge/country-weather'      
+    COMMIT    = "${env.GIT_COMMIT ?: 'local'}"
+    IMG_TAG   = "${env.BUILD_NUMBER}-${COMMIT.take(7)}"
+    HOST_PORT = '8082'                      // host port (Jenkins is on 8080)
+    CONT_PORT = '8080'                      // Tomcat internal port
+    WORKDIR   = 'Jenkins-Work/country-weather-dashboard'
   }
 
   stages {
@@ -30,35 +29,53 @@ pipeline {
     }
 
     stage('Build & Unit Test') {
-      steps { sh 'mvn -B -e clean verify' }
-      post { always { junit 'target/surefire-reports/*.xml' } }
+      steps {
+        dir("${WORKDIR}") {
+          sh 'mvn -B -e clean verify'
+        }
+      }
+      post {
+        always {
+          dir("${WORKDIR}") {
+            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+          }
+        }
+      }
     }
 
     stage('Package WAR') {
-      steps { sh 'mvn -B -DskipTests package' }
+      steps {
+        dir("${WORKDIR}") {
+          sh 'mvn -B -DskipTests package'
+        }
+      }
     }
 
     stage('Build Image') {
       steps {
-        sh """
-          docker build -t ${IMAGE}:${IMG_TAG} -t ${IMAGE}:latest .
-          docker images | head -n 10
-        """
+        dir("${WORKDIR}") {
+          sh """
+            docker build -t ${IMAGE}:${IMG_TAG} -t ${IMAGE}:latest .
+            docker images | head -n 10
+          """
+        }
       }
     }
 
     stage('SonarQube') {
       when { expression { return params.RUN_SONAR } }
       steps {
-        withSonarQubeEnv('SonarQubeServer') {
-          withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-            sh '''
-              mvn -B sonar:sonar \
-                -Dsonar.login=$SONAR_TOKEN \
-                -Dsonar.projectKey=country-weather-dashboard \
-                -Dsonar.projectName=country-weather-dashboard \
-                -Dsonar.java.binaries=target/classes
-            '''
+        dir("${WORKDIR}") {
+          withSonarQubeEnv('SonarQubeServer') {
+            withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+              sh '''
+                mvn -B sonar:sonar \
+                  -Dsonar.login=$SONAR_TOKEN \
+                  -Dsonar.projectKey=country-weather-dashboard \
+                  -Dsonar.projectName=country-weather-dashboard \
+                  -Dsonar.java.binaries=target/classes
+              '''
+            }
           }
         }
       }
@@ -79,7 +96,7 @@ pipeline {
         sh '''
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
             aquasec/trivy:latest image --no-progress --exit-code 1 \
-            --severity HIGH,CRITICAL ${IMAGE}:${IMG_TAG}
+            --severity HIGH,CRITICAL '"'"'${IMAGE}:${IMG_TAG}'"'"'
         '''
       }
     }
