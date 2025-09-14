@@ -133,6 +133,20 @@ pipeline {
         """
       }
     }
+
+    stage('Smoke Test') {
+      steps {
+        sh '''
+         for i in $(seq 1 30); do
+         code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8082/ || true)
+         [ "$code" = "200" ] && break
+         sleep 2
+         done
+         curl -sSf "http://localhost:8082/search?q=Ghana" | grep -qi "Ghana"
+        '''
+   }
+ }
+
   }
 
   post {
