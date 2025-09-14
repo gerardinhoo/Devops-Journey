@@ -9,15 +9,16 @@
   <packaging>war</packaging>
 
   <distributionManagement>
-    <repository>
-      <id>nexus-releases</id>
-      <url>http://3.150.94.17:8081/repository/maven-releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>nexus-snapshots</id>
-      <url>http://3.150.94.17:8081/repository/maven-releases/</url>
-    </snapshotRepository>
-  </distributionManagement>
+  <repository>
+    <id>nexus-releases</id>
+    <url>http://3.150.94.17:8081/repository/maven-releases/</url>
+  </repository>
+  <snapshotRepository>
+    <id>nexus-snapshots</id>
+    <url>http://3.150.94.17:8081/repository/maven-snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
+
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
