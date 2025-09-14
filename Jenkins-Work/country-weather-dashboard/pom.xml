@@ -5,7 +5,7 @@
 
   <groupId>com.ge.dashboard</groupId>
   <artifactId>country-weather-dashboard</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <distributionManagement>
