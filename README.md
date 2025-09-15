@@ -15,30 +15,27 @@ Welcome to my **DevOps learning journey** — a collection of hands-on projects 
 
 ```mermaid
 flowchart TD
-    A[Start: Bash Fundamentals] --> B[Linux + EC2 Setup]
-    B --> C[Nexus 3 Setup]
-    C --> D[Nexus Demo App (Maven Deployment)]
-    D --> E[GCP Infra with Terraform]
-    E --> F[Dockerized Node.js API]
-    F --> G[Flask App in Docker]
-    G --> H[Microservices Journey]
-    H --> I[Jenkins Work]
-    I --> J[GitHub Actions Workflows]
-    J --> K[AWS Services]
-    K --> L[Kubernetes Deployments]
-    L --> M[Ansible Automation]
-    M --> N[Prometheus + Grafana]
-    N --> O[Python Automation Scripts]
-    O --> P[Centralized Logging & Observability]
-    P --> Q[Secrets Management]
+  A[Start: Bash Fundamentals] --> B[Linux + EC2 Setup]
+  B --> C[Nexus 3 Setup]
+  C --> D[Nexus Demo App (Maven Deployment)]
+  D --> E[GCP Infra with Terraform]
+  E --> F[Dockerized Node.js API]
+  F --> G[Flask App in Docker]
+  G --> H[Microservices Journey]
+  H --> I[Jenkins Work]
+  I --> J[GitHub Actions Workflows]
+  J --> K[AWS Services]
+  K --> L[Kubernetes Deployments]
+  L --> M[Ansible Automation]
+  M --> N[Prometheus + Grafana]
+  N --> O[Python Automation Scripts]
+  O --> P[Centralized Logging & Observability]
+  P --> Q[Secrets Management]
 ```
 
 ---
 
 ## 📁 Projects
-
-<details>
-<summary>Repo structure</summary>
 
 ### 🐚 [Bash Fundamentals](./bash_fundamentals)
 
