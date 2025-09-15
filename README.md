@@ -173,8 +173,6 @@ This repo serves as my **DevOps lab** to:
 
 ### 🚧 In Progress
 
-- Expanding Terraform project (multi-env, remote backend, monitoring)
-- Jenkins advanced pipelines (Trivy, SonarQube, Slack integration)
 - GitHub Actions workflows for CI/CD
 
 ### 🎯 Planned
