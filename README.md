@@ -7,7 +7,7 @@
 
 ---
 
-Welcome to my **DevOps learning journey** — a collection of hands-on projects to build and showcase skills in automation, scripting, CI/CD, and cloud engineering.
+Welcome to my **DevOps learning journey**. This is a collection of hands-on projects to build and showcase skills in automation, scripting, CI/CD, and cloud engineering.
 
 ---
 
