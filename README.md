@@ -13,7 +13,7 @@ Welcome to my **DevOps learning journey** — a collection of hands-on projects 
 
 ## 📊 Visual Roadmap
 
-```mermaid
+```
 flowchart TD
   A[Start: Bash Fundamentals] --> B[Linux + EC2 Setup]
   B --> C[Nexus 3 Setup]
