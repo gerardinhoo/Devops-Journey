@@ -1,182 +1,160 @@
 # 🚀 DevOps Journey
 
-Welcome to my **DevOps learning journey**. A collection of hands-on practice projects to build foundational skills in automation, scripting, and cloud engineering.
+Welcome to my **DevOps learning journey** — a collection of hands-on projects to build and showcase skills in automation, scripting, CI/CD, and cloud engineering.
 
 ---
 
 ## 📁 Projects
 
-### 🐚 [Bash Fundamentals](./bash_fundamentals.sh)
+### 🐚 [Bash Fundamentals](./bash_fundamentals)
 
-A beginner-friendly project focused on mastering Bash scripting essentials.  
-Includes examples of:
+Mastering the essentials of Bash scripting:
 
 - Variables and user input
 - Arithmetic operations
-- Conditional statements
-- Loops and functions
+- Conditionals, loops, and functions
 - File handling with condition checks
 
-➡️ Detailed README inside: [`bash_fundamentals/README.md`](./bash_fundamentals/README.md)
+➡️ [Detailed README](./bash_fundamentals/README.md)
 
 ---
 
-### 🐧 [Linux + EC2 Setup](./linux-ec2-setup)
+### 🐧 [Linux + EC2 Setup](./linux_devops)
 
-Hands-on setup of an Ubuntu EC2 instance using AWS, with secure SSH access and development via VS Code Remote.  
-Also includes Linux command practice inspired by DevOps workflows.
+Hands-on setup of an Ubuntu EC2 instance with secure SSH access and Linux practice.
 
-Includes:
-
-- Launching and connecting to EC2 (SSH + `.pem` key)
+- Launching EC2 and connecting via SSH + `.pem`
 - Creating an SSH config for quick access
-- Using VS Code Remote - SSH to work on EC2
-- Practicing common Linux commands (`pwd`, `ls`, `mkdir`, `rm -rvf`, etc.)
+- VS Code Remote-SSH integration
+- Practicing Linux commands (`pwd`, `ls`, `mkdir`, `rm -rvf`, etc.)
 
-➡️ Detailed README inside: [`linux_devops/README.md`](./linux_devops/README.md)
+➡️ [Detailed README](./linux_devops/README.md)
 
 ---
 
 ### ☕ [Nexus Demo App (Maven Deployment)](./nexus-demo-app)
 
-A simple Java application created with Maven to demonstrate artifact deployment to a **hosted Nexus repository**.  
-Covers full configuration from `pom.xml` to `.m2/settings.xml` and shows how to push `.jar` files to Nexus.
+A simple Java/Maven project deployed to **Nexus Repository**.
 
-Includes:
+- `pom.xml` + `settings.xml` configuration
+- Using `mvn clean deploy` to upload artifacts
+- Demonstrating private artifact repository management
 
-- Maven `distributionManagement` configuration
-- Nexus credentials setup in `settings.xml`
-- Using `mvn clean deploy` to upload builds
-- Practical use of Nexus as a private artifact repo
-
-➡️ Detailed README inside: [`nexus-demo-app/README.md`](./nexus-demo-app/README.md)
+➡️ [Detailed README](./nexus-demo-app/README.md)
 
 ---
 
-### 📦 [Nexus 3 Installation & Setup](./maven-nexus)
+### 📦 [Nexus 3 Setup](./maven-nexus)
 
-Step-by-step guide to install and configure **Sonatype Nexus Repository Manager 3** on an Ubuntu EC2 instance.
+Step-by-step **Nexus 3 installation** on Ubuntu EC2:
 
-Covers:
+- Install & configure Nexus
+- Create system service
+- Hosted, proxy, and group repositories
 
-- Downloading and extracting Nexus
-- Creating a `nexus` system user
-- Setting permissions and configuring `nexus.rc`
-- Creating a `systemd` service to run Nexus on boot
-- Accessing the Nexus UI and retrieving the admin password
-
-➡️ Detailed README inside: [`maven-nexus/README.md`](./maven-nexus/README.md)
+➡️ [Detailed README](./maven-nexus/README.md)
 
 ---
 
 ### ☁️ [GCP Infrastructure with Terraform](./gcp-terraform-infra)
 
-Provisioning and managing infrastructure on Google Cloud using **Terraform**, including:
+Provisioning GCP resources using **Terraform**:
 
-- Creating a VPC, Subnet, Firewall, and VM Instance
-- Writing `main.tf`, `variables.tf`, `terraform.tfvars`, and `outputs.tf`
-- Automatically installing Docker on the VM via a `startup.sh` script
-- SSH into the VM and verify provisioning
-- Understand Terraform state, remote provisioning, and IaC best practices
+- VPC, subnet, firewall, VM instance
+- `main.tf`, `variables.tf`, `terraform.tfvars`, outputs
+- Docker auto-install via `startup.sh`
+- Remote backend with GCS + Terraform workspaces (dev/prod)
 
-➡️ Detailed README inside: [`gcp-terraform-infra/README.md`](./gcp-terraform-infra/README.md)
-
----
+➡️ [Detailed README](./gcp-terraform-infra/README.md)
 
 ---
 
-### 🐳 [Dockerized Node.js App Deployment (EC2)](./simple-node-api)
+### 🐳 [Dockerized Node.js API](./simple-node-api)
 
-Containerized and deployed a simple Node.js API to an **Ubuntu EC2 instance** using Docker.  
-This project demonstrates containerizing an Express server, exposing it to the public internet, and verifying it live from a browser.
+Containerizing and deploying a Node.js/Express API to EC2.
 
-Includes:
+- Dockerfile + build/run workflow
+- Exposing port 3000 for public access
+- Testing with browser & `curl`
 
-- A lightweight Express server (`index.js`)
-- Dockerfile to build and run the app
-- Exposing port 3000 and verifying container output
-- `docker build`, `docker run`, and `docker ps` usage
-- Browser-accessible output via EC2 Public IP (`http://<EC2_IP>:3000`)
-
-➡️ Detailed README inside: [`simple-node-api/README.md`](./simple-node-api/README.md)
+➡️ [Detailed README](./simple-node-api/README.md)
 
 ---
 
-### 🐍 Simple Flask App — Dockerized
+### 🐍 [Flask App in Docker](./docker-python-flask)
 
-Path: [`docker-python-flask/`](./docker-python-flask)
+Tiny **Flask API** running in Docker, with dev/prod Compose setups.
 
-A tiny Flask app in Docker. Comes with **Dockerfile** and **Compose (dev/prod)**; optional EC2 deploy.
+- `docker build` & `docker run` basics
+- `docker compose up` for multi-env orchestration
 
-Quickstart:
-
-```bash
-# Basic Docker
-cd docker-python-flask
-docker build -t flask-app .
-docker run -d -p 5000:5000 flask-app
-# open http://localhost:5000
-```
+➡️ [Detailed README](./docker-python-flask/README.md)
 
 ---
 
-### 🧩 Microservices Learning Track (Monolith → Microservices)
+### 🧩 [Microservices Journey](./microservices)
 
-A hands-on comparison of architectures using the tiny **ShopLite** domain (Users & Orders).
+Learning **Monolith → Microservices** via a ShopLite demo app.
 
-- **Monolith:** [`microservices/monolithicProject`](./microservices/monolithicProject) — single-process Node/Express app.
-- **Microservices:** [`microservices/microservicesProject`](./microservices/microservicesProject) — split into `users-svc` and `orders-svc` wired with Docker Compose.
+- **Monolith**: Node/Express app with users & orders in one codebase
+- **Microservices**: Split into `users-svc` & `orders-svc`, wired with Docker Compose
+- Added `/health` checks and service dependencies
 
-Quickstart:
+➡️ [Detailed README](./microservices/README.md)
 
-```bash
-# Monolith
-cd microservices/monolithicProject && npm i && npm run dev
+---
 
-# Microservices
-cd microservices/microservicesProject && docker compose up --build
-```
+### ⚙️ [Jenkins Work](./Jenkins-Work)
+
+Exploring **Jenkins CI/CD pipelines**:
+
+- Freestyle and Pipeline jobs
+- GitHub webhook integration
+- Jenkinsfile with build/test/deploy stages
+- Future: Trivy scans, SonarQube checks, Slack notifications
+
+➡️ [Detailed README](./Jenkins-Work/README.md)
 
 ---
 
 ## 🧠 About
 
-This repository serves as a personal DevOps lab to:
+This repo serves as my **DevOps lab** to:
 
-- Practice automation through scripting
-- Document and share learning progress
-- Prepare for DevOps/SRE job interviews
+- Practice automation, IaC, and CI/CD
+- Document hands-on progress
+- Build a portfolio for DevOps/SRE interviews
 
 ---
 
-## 📌 What's next?
-
-This DevOps Journey is just getting started. Progress tracker:
+## 📌 Roadmap
 
 ### ✅ Completed
 
-- Dockerized Node.js app with custom image hosted on Docker Hub
-- Manual EC2 deployment using SSH
-- CI/CD pipeline using GitHub Actions (build/push and deploy)
-- Multi-container orchestration with Docker Compose (users-svc + orders-svc)
-- Dockerized Flask app (dev/prod Compose; optional EC2 deploy)
+- Bash scripting fundamentals
+- Linux + EC2 setup
+- Nexus 3 setup + artifact deployment
+- GCP infra with Terraform (VM + Docker provisioning)
+- Node.js app containerized + deployed to EC2
+- Flask app containerized + Docker Compose (dev/prod)
+- Monolith → Microservices refactor (users/orders services)
+- Jenkins setup + initial pipelines
 
-### 🚧 In progress
+### 🚧 In Progress
 
-- GCP deployment using Terraform (WIP)
-- Health checks & readiness (Compose + services) and basic auto-restarts
+- Expanding Terraform project (multi-env, remote backend, monitoring)
+- Jenkins advanced pipelines (Trivy, SonarQube, Slack integration)
+- GitHub Actions workflows for CI/CD
 
 ### 🎯 Planned
 
-- Monitoring with Prometheus + Grafana
-- Jenkins pipeline (CI) alongside GitHub Actions
-- Kubernetes deployment to GKE
-- Log aggregation & metrics (e.g., EFK/ELK, OpenTelemetry)
-- Secrets management and environment hardening
-
-Stay tuned as this repo evolves into a full-scale DevOps showcase.
-
-Stay tuned!
+- AWS services (EC2, S3, IAM, Lambda, RDS)
+- Kubernetes deployments (EKS/GKE)
+- Ansible automation (config management)
+- Prometheus + Grafana monitoring stack
+- Python automation scripts
+- Centralized logging (EFK/ELK, OpenTelemetry)
+- Secrets management (Vault, cloud-native solutions)
 
 ---
 
