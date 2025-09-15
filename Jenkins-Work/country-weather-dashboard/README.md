@@ -81,13 +81,14 @@ Run on a server (e.g., EC2):
 ```bash
 mvn -DskipTests package
 docker build -t ge/country-weather:0.1.0 .
-docker run -d --name country-weather --restart unless-stopped   -p 8082:8080 ge/country-weather:0.1.0
+docker run -d --name country-weather --restart unless-stopped \
+  -p 8082:8080 ge/country-weather:0.1.0
 # visit http://<EC2_PUBLIC_IP>:8082/
 ```
 
 Tomcat listens on **8080 in the container**; we map **host 8082 → container 8080** to avoid clashing with Jenkins (8080).
 
-### 2) Jenkins Pipeline (build → test → image → (optional) scan → deploy)
+### 2) Jenkins Pipeline (build → test → analyze → publish → image → scan → deploy)
 
 A **Declarative Jenkinsfile** at:
 
@@ -97,7 +98,7 @@ Jenkins-Work/country-weather-dashboard/Jenkinsfile
 
 **Parameters**
 
-- `RUN_SONAR` (default: false)
+- `RUN_SONAR` (default: true)
 - `RUN_TRIVY` (default: true)
 - `PUSH_IMAGE` (default: false)
 - `DEPLOY` (default: true)
@@ -105,26 +106,53 @@ Jenkins-Work/country-weather-dashboard/Jenkinsfile
 **Stages**
 
 1. Checkout
-2. Build & Unit Test (`mvn clean verify`)
-3. Package WAR
-4. Build Image (Docker)
-5. Trivy Scan _(optional)_
-6. Push Image _(optional)_
-7. Deploy (Dockerized Tomcat) → runs container on port **8082** on the Jenkins node
+2. Tool Versions (prints versions for Java/Maven/Docker)
+3. Build & Unit Test (`mvn clean verify`)
+4. **SonarQube Analysis** (`mvn sonar:sonar`) + **Quality Gate** (waits for OK)
+5. Publish to **Nexus** (`mvn deploy` to `maven-snapshots`)
+6. Pull WAR from Nexus (guarantees we use the built artifact)
+7. Build Image (Docker)
+8. Trivy Scan _(optional)_ — fails the build on **HIGH/CRITICAL**
+9. Push Image _(optional to Docker Hub)_
+10. Deploy (Dockerized Tomcat) → runs container on port **8082** on the Jenkins node
 
-> Jenkins Tools required: JDK named `jdk17`, Maven named `maven-3.9` (or use `tools { jdk 'jdk17'; maven 'maven-3.9' }` in the Jenkinsfile). Agent must have Docker and permission to run it (`sudo usermod -aG docker jenkins && sudo systemctl restart jenkins`).
+> Jenkins Tools required: JDK named `jdk17`, Maven named `maven-3.9`. Agent must have Docker and permission to run it (`sudo usermod -aG docker jenkins && sudo systemctl restart jenkins`).
 
-### 3) Quick smoke tests
+### 3) Credentials (Jenkins → Manage Credentials)
+
+| ID                | Kind                   | Used For                                 |
+| ----------------- | ---------------------- | ---------------------------------------- |
+| `sonar-token`     | Secret text            | SonarQube `-Dsonar.login` + Quality Gate |
+| `nexus-user`      | Username/Password      | `<server>` in `.mvn-settings-nexus.xml`  |
+| `dockerhub-creds` | Username/Password      | `docker login` / image push              |
+| `slack-bot-token` | Secret text (optional) | Pipeline notifications                   |
+
+### 4) SonarQube setup (quick)
+
+- Create token: **SonarQube UI → User (top-right) → My Account → Security → Generate Token**
+- Jenkins global config: **Manage Jenkins → System → SonarQube servers**
+  - Name: `SonarQubeServer`
+  - Server URL: `http://<EC2_PUBLIC_IP>:9000/`
+  - **Server authentication token**: add a **Secret text** credential containing the token
+- (Optional) If you analyze CSS/JS with Sonar, install Node.js on the agent (`node -v` must work).
+
+### 5) Nexus setup (quick)
+
+- Repos: `maven-releases` and `maven-snapshots` (hosted), `maven-public` (group).
+- Jenkins uses a small `.mvn-settings-nexus.xml` to inject credentials and server IDs during `mvn deploy`.
+- We deployed the WAR to **snapshots**, then pulled it back before building the image.
+
+### 6) Quick smoke tests
 
 From the server:
 
 ```bash
 curl -I http://localhost:8082/
 curl -I "http://localhost:8082/search?q=Ghana"
-docker ps --format '{{.Names}}	{{.Ports}}'
+docker ps --format '{{.Names}}\t{{.Ports}}'
 ```
 
-### 4) Webhook (GitHub → Jenkins)
+### 7) Webhook (GitHub → Jenkins)
 
 Trigger pipeline automatically on each push.
 
@@ -135,18 +163,18 @@ Trigger pipeline automatically on each push.
 
 **In GitHub (repo Settings → Webhooks):**
 
-- **Payload URL:** `http://<EC2_PUBLIC_IP>:8080/github-webhook/` _(note trailing slash)_
+- **Payload URL:** `http://<EC2_PUBLIC_IP>:8080/github-webhook/` (note trailing slash)
 - **Content type:** `application/json`
 - **Events:** Just the **push** event
 - Save → **Redeliver/Ping** to see **200 OK**
 
-Now any commit to `main` automatically builds, containerizes, and deploys to:
+Now any commit to `main` automatically builds, analyzes, publishes to Nexus, containerizes, (optionally scans & pushes), and deploys to:
 
 ```
 http://<EC2_PUBLIC_IP>:8082/
 ```
 
-### 5) .gitignore / .dockerignore tips
+### 8) .gitignore / .dockerignore tips
 
 - **.gitignore** (repo): ignore build artifacts & IDE files
   ```
@@ -194,6 +222,8 @@ mvn clean package
 
 ## 🧯 Troubleshooting
 
+- **SonarQube 401 in `waitForQualityGate`:** verify Jenkins has the correct **Server authentication token** and that the server URL is reachable from Jenkins.
+- **"node -v" missing during Sonar CSS/JS step:** install Node.js on the agent if you want front-end rules scanned.
 - **Docker COPY fails for WAR:** Build the WAR first (`mvn -DskipTests package`). Ensure `.dockerignore` does not exclude `target/`.
 - **Port in use (8080/8082):** Stop old container or change `-p host:container` mapping.
 - **Jenkins `mvn` not found:** Use `tools { jdk 'jdk17'; maven 'maven-3.9' }` in the Jenkinsfile or configure Tools in Jenkins.
@@ -202,11 +232,11 @@ mvn clean package
 
 ## 🗺️ Roadmap (next)
 
-- Publish WAR to **Nexus** (`mvn deploy`)
-- Push image to **Docker Hub/GHCR**
-- Add **SonarQube** gate
-- Keep **Trivy** optional gate on HIGH/CRITICAL
-- Add a `/health` endpoint and basic readiness checks
+- Add a `/health` endpoint and readiness checks
+- Wire **JaCoCo** coverage and publish to Sonar
+- Multi-stage Dockerfile to slim the image
+- Parameterize deploy port and container name
+- Integration tests for the services
 
 ## 🙏 Acknowledgements
 
