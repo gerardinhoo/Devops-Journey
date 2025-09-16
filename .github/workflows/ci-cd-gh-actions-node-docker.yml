@@ -92,29 +92,37 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -euo pipefail
+
             GH_USER="${{ github.repository_owner }}"
             TAG="${{ github.sha }}"
-            REMOTE_DIR="/home/${{ secrets.EC2_USER }}/app"
+            REMOTE_DIR="/home/${USER}/app"
             COMPOSE_FILE="${REMOTE_DIR}/compose.yml"
 
             # Ensure Docker & Compose
-            command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
-            docker compose version || (sudo apt-get update && sudo apt-get install -y docker-compose-plugin)
+            if ! command -v docker >/dev/null 2>&1; then
+              curl -fsSL https://get.docker.com | sh
+            fi
+            sudo apt-get update -y
+            sudo apt-get install -y docker-compose-plugin || true
+            docker compose version
+
+            # Sanity check the file we just uploaded
+            test -f "$COMPOSE_FILE" || { echo "Missing $COMPOSE_FILE"; ls -al "$REMOTE_DIR"; exit 1; }
+            echo "Remote dir contents:"; find "$REMOTE_DIR" -maxdepth 2 -name 'compose.yml' -print -exec ls -l {} \;
 
             cd "$REMOTE_DIR"
-            test -f "$COMPOSE_FILE" || { echo "Missing $COMPOSE_FILE"; ls -al; exit 1; }
 
-            # Login only if image is private
+            # Login only if the image is private
             if [ -n "${GHCR_PAT:-}" ]; then
-              echo "${GHCR_PAT}" | docker login ghcr.io -u "${GH_USER}" --password-stdin
+              echo "${GHCR_PAT}" | sudo -E docker login ghcr.io -u "${GH_USER}" --password-stdin
             fi
 
-            echo "Remote dir contents:"; find "$REMOTE_DIR" -maxdepth 2 -type f -name 'compose.yml' -print -exec ls -l {} \;
-
-            GH_USER="${GH_USER}" TAG="${TAG}" docker compose -f "$COMPOSE_FILE" pull
-            GH_USER="${GH_USER}" TAG="${TAG}" docker compose -f "$COMPOSE_FILE" up -d
+            # IMPORTANT: use sudo -E so GH_USER and TAG are visible to Compose
+            export GH_USER TAG
+            sudo -E docker compose -f "$COMPOSE_FILE" pull
+            sudo -E docker compose -f "$COMPOSE_FILE" up -d
 
             # Health check
-            curl -fsS http://localhost/health || (docker logs ga-demo && exit 1)
+            curl -fsS http://localhost/health || (sudo docker logs ga-demo && exit 1)
 
-            docker image prune -f
+            sudo docker image prune -f
