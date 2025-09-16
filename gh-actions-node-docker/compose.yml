@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/$gerardinhoo/gh-actions-node-docker:${TAG:-latest}
+    image: ghcr.io/${GH_USER}/gh-actions-node-docker:${TAG:-latest} # value will be overridden
     container_name: ga-demo
     restart: unless-stopped
     ports:

@@ -85,7 +85,7 @@ jobs:
       - name: SSH deploy
         uses: appleboy/ssh-action@v1.2.0
         env:
-          GHCR_PAT: ${{ secrets.GHCR_PAT }} # only if your GHCR package is private
+          GHCR_PAT: ${{ secrets.GHCR_PAT }} # only if package is private
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -97,32 +97,41 @@ jobs:
             TAG="${{ github.sha }}"
             REMOTE_DIR="/home/${USER}/app"
             COMPOSE_FILE="${REMOTE_DIR}/compose.yml"
+            OVERRIDE_FILE="${REMOTE_DIR}/compose.override.yml"
+            IMAGE="ghcr.io/${GH_USER}/gh-actions-node-docker:${TAG}"
 
-            # Ensure Docker & Compose
+            # Ensure Docker & Compose exist (no upgrades)
             if ! command -v docker >/dev/null 2>&1; then
               curl -fsSL https://get.docker.com | sh
             fi
-            sudo apt-get update -y
-            sudo apt-get install -y docker-compose-plugin || true
-            docker compose version
+            docker compose version || (sudo apt-get update -y && sudo apt-get install -y docker-compose-plugin || true)
 
-            # Sanity check the file we just uploaded
+            # Light cleanup to avoid ENOSPC
+            sudo docker system prune -af || true
+            sudo apt-get clean || true
+            sudo rm -rf /var/lib/apt/lists/* || true
+
+            # Sanity check we have the base compose
             test -f "$COMPOSE_FILE" || { echo "Missing $COMPOSE_FILE"; ls -al "$REMOTE_DIR"; exit 1; }
-            echo "Remote dir contents:"; find "$REMOTE_DIR" -maxdepth 2 -name 'compose.yml' -print -exec ls -l {} \;
 
-            cd "$REMOTE_DIR"
+            # Generate a tiny override with the fully-resolved image
+            cat > "$OVERRIDE_FILE" <<EOF
+            services:
+              web:
+                image: ${IMAGE}
+            EOF
+            echo "Using image: ${IMAGE}"
 
-            # Login only if the image is private
+            # Log in to GHCR only if private
             if [ -n "${GHCR_PAT:-}" ]; then
-              echo "${GHCR_PAT}" | sudo -E docker login ghcr.io -u "${GH_USER}" --password-stdin
+              echo "${GHCR_PAT}" | sudo docker login ghcr.io -u "${GH_USER}" --password-stdin
             fi
 
-            # IMPORTANT: use sudo -E so GH_USER and TAG are visible to Compose
-            export GH_USER TAG
-            sudo -E docker compose -f "$COMPOSE_FILE" pull
-            sudo -E docker compose -f "$COMPOSE_FILE" up -d
+            # Pull & deploy with override file
+            sudo docker compose -f "$COMPOSE_FILE" -f "$OVERRIDE_FILE" pull
+            sudo docker compose -f "$COMPOSE_FILE" -f "$OVERRIDE_FILE" up -d
 
             # Health check
             curl -fsS http://localhost/health || (sudo docker logs ga-demo && exit 1)
 
-            sudo docker image prune -f
+            sudo docker image prune -f || true
