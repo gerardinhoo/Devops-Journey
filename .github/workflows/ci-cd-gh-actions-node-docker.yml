@@ -1,4 +1,4 @@
-name: CI/CD
+name: GITHUB CI/CD
 
 on:
   push:
@@ -69,7 +69,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: mkdir -p ~/app
+          script: mkdir -p /home/${{ secrets.EC2_USER }}/app
 
       - name: Upload compose.yml
         uses: appleboy/scp-action@v0.1.7
@@ -77,13 +77,14 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'gh-actions-node-docker/compose.yml' # from repo
-          target: '~/app' # to EC2
+          source: 'gh-actions-node-docker/compose.yml'
+          target: '/home/${{ secrets.EC2_USER }}/app/'
+          overwrite: true
 
       - name: SSH deploy
         uses: appleboy/ssh-action@v1.2.0
         env:
-          GHCR_PAT: ${{ secrets.GHCR_PAT }} # only needed if GHCR package is private
+          GHCR_PAT: ${{ secrets.GHCR_PAT }} # only if your GHCR package is private
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -92,21 +93,25 @@ jobs:
             set -euo pipefail
             GH_USER="${{ github.repository_owner }}"
             TAG="${{ github.sha }}"
+            REMOTE_DIR="/home/${{ secrets.EC2_USER }}/app"
+            COMPOSE_FILE="${REMOTE_DIR}/compose.yml"
 
-            # Install docker if missing
+            # Ensure Docker & Compose
             command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
+            docker compose version || (sudo apt-get update && sudo apt-get install -y docker-compose-plugin)
 
-            cd ~/app
+            cd "$REMOTE_DIR"
+            test -f "$COMPOSE_FILE" || { echo "Missing $COMPOSE_FILE"; ls -al; exit 1; }
 
-            # Login to GHCR only if pulling private images
+            # Login only if image is private
             if [ -n "${GHCR_PAT:-}" ]; then
               echo "${GHCR_PAT}" | docker login ghcr.io -u "${GH_USER}" --password-stdin
             fi
 
-            GH_USER="${GH_USER}" TAG="${TAG}" docker compose pull
-            GH_USER="${GH_USER}" TAG="${TAG}" docker compose up -d
+            GH_USER="${GH_USER}" TAG="${TAG}" docker compose -f "$COMPOSE_FILE" pull
+            GH_USER="${GH_USER}" TAG="${TAG}" docker compose -f "$COMPOSE_FILE" up -d
 
-            # quick health check
+            # Health check
             curl -fsS http://localhost/health || (docker logs ga-demo && exit 1)
 
             docker image prune -f
