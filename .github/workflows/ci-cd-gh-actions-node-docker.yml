@@ -1,4 +1,4 @@
-name: GITHUB CI/CD
+name: Github Actios CI/CD
 
 on:
   push:
