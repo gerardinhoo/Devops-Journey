@@ -3,6 +3,9 @@ name: CI/CD
 on:
   push:
     branches: ['main']
+    paths:
+      - 'gh-actions-node-docker/**'
+      - '.github/workflows/ci-cd-gh-actions-node-docker.yml'
   workflow_dispatch:
 
 # Needed to push to GHCR with GITHUB_TOKEN
@@ -13,11 +16,14 @@ permissions:
 env:
   IMAGE_NAME: gh-actions-node-docker
   REGISTRY: ghcr.io
-  GH_USER: ${{ github.repository_owner }} # or hardcode: gerardinhoo
+  GH_USER: ${{ github.repository_owner }}
 
 jobs:
   ci-build-test:
-    runs-on: ubuntu-latest # fixed typo
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gh-actions-node-docker
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,7 +49,7 @@ jobs:
       - name: Build & Push (latest + sha)
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./gh-actions-node-docker #build from subfolder
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.GH_USER }}/${{ env.IMAGE_NAME }}:latest
@@ -54,53 +60,50 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Prepare tag vars
-        id: prep
-        run: echo "TAG=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+      - name: Ensure remote dir
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: mkdir -p ~/app
 
-      - name: SSH to EC2 and deploy
+      - name: Upload compose.yml
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: 'gh-actions-node-docker/compose.yml' # from repo
+          target: '~/app' # to EC2
+
+      - name: SSH deploy
         uses: appleboy/ssh-action@v1.2.0
         env:
-          GHCR_PAT: ${{ secrets.GHCR_PAT }} # only if your GHCR repo is private
+          GHCR_PAT: ${{ secrets.GHCR_PAT }} # only needed if GHCR package is private
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -euo pipefail
-
             GH_USER="${{ github.repository_owner }}"
-            TAG="${{ steps.prep.outputs.TAG }}"
+            TAG="${{ github.sha }}"
 
-            # Ensure Docker exists (compose plugin included on recent installs)
-            if ! command -v docker >/dev/null 2>&1; then
-              curl -fsSL https://get.docker.com | sh
-            fi
+            # Install docker if missing
+            command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
 
-            mkdir -p ~/app
             cd ~/app
 
-            # Create compose.yml if missing (note: closing YAML must be flush-left, no spaces)
-            if [ ! -f compose.yml ]; then
-            cat > compose.yml <<'YAML'
-            services:
-            web:
-               image: ghcr.io/${GH_USER}/gh-actions-node-docker:${TAG:-latest}
-               container_name: ga-demo
-               restart: unless-stopped
-               ports:
-                  - "80:3000"
-               environment:
-                  - NODE_ENV=production
-            YAML
-            fi
-
-            # Login only if pulling a private image
+            # Login to GHCR only if pulling private images
             if [ -n "${GHCR_PAT:-}" ]; then
               echo "${GHCR_PAT}" | docker login ghcr.io -u "${GH_USER}" --password-stdin
             fi
 
             GH_USER="${GH_USER}" TAG="${TAG}" docker compose pull
             GH_USER="${GH_USER}" TAG="${TAG}" docker compose up -d
+
+            # quick health check
+            curl -fsS http://localhost/health || (docker logs ga-demo && exit 1)
 
             docker image prune -f
