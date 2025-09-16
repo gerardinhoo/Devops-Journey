@@ -148,17 +148,14 @@ Exploring **Jenkins CI/CD pipelines**:
 
 ---
 
-### ⚙️ [GitHub Actions (Node + Docker + GHCR + EC2)](./gh-actions-node-docker)
+### ⚙️ [Github Actions](./gh-actions-node-docker)
 
-CI/CD with **GitHub Actions**:
+CI/CD with **Github Actions CI/CD pipelines**:
 
-- CI: Node 20, `npm ci`, run tests
-- Build & push Docker image to **GitHub Container Registry (GHCR)**
-- CD: SSH to **EC2**, upload `compose.yml`, `docker compose up -d`
-- Health check with retries and container logs on failure
+- GitHub webhook integration
+- Github Workflow with build/test/deploy stages
 
-[**Detailed README →**](./gh-actions-node-docker/README.md)
-![CI/CD – gh-actions-node-docker](https://github.com/gerardinhoo/Devops-Journey/actions/workflows/ci-cd-gh-actions-node-docker.yml/badge.svg)
+➡️ [Detailed README](./Jenkins-Work/README.md)
 
 ---
 
