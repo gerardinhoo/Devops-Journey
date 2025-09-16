@@ -95,7 +95,7 @@ jobs:
 
             GH_USER="${{ github.repository_owner }}"
             TAG="${{ github.sha }}"
-            REMOTE_DIR="/home/${USER}/app"
+            REMOTE_DIR="/home/${{ secrets.EC2_USER }}/app"   # 👈 keep consistent
             COMPOSE_FILE="${REMOTE_DIR}/compose.yml"
             OVERRIDE_FILE="${REMOTE_DIR}/compose.override.yml"
             IMAGE="ghcr.io/${GH_USER}/gh-actions-node-docker:${TAG}"
@@ -129,9 +129,23 @@ jobs:
 
             # Pull & deploy with override file
             sudo docker compose -f "$COMPOSE_FILE" -f "$OVERRIDE_FILE" pull
-            sudo docker compose -f "$COMPOSE_FILE" -f "$OVERRIDE_FILE" up -d
+            sudo docker compose -f "$COMPOSE_FILE" -f "$OVERRIDE_FILE" up -d   # ✅ keep only this one
 
-            # Health check
-            curl -fsS http://localhost/health || (sudo docker logs ga-demo && exit 1)
+            # Wait up to ~60s for the app; try /health on :80 and :3000
+            echo "Waiting for app to be ready..."
+            for i in {1..30}; do
+              if curl -fsS http://localhost/health >/dev/null 2>&1 || \
+                 curl -fsS http://localhost:3000/health >/dev/null 2>&1; then
+                echo "App is up ✅"
+                ready=1
+                break
+              fi
+              echo "Still starting... ($i/30)"; sleep 2
+            done
 
-            sudo docker image prune -f || true
+            # If still not ready, show container logs and fail
+            if [ -z "${ready:-}" ]; then
+              echo "Health check failed. Showing logs:"
+              sudo docker compose -f "$COMPOSE_FILE" -f "$OVERRIDE_FILE" logs --no-color --tail=200 web || sudo docker logs ga-demo || true
+              exit 1
+            fi
