@@ -60,6 +60,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
+      - name: Checkout (for deploy)
+        uses: actions/checkout@v4
+
       - name: Ensure remote dir
         uses: appleboy/ssh-action@v1.2.0
         with:
