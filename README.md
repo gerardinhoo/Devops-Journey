@@ -185,10 +185,14 @@ This repo serves as my **DevOps lab** to:
 - Monolith → Microservices refactor (users/orders services)
 - Jenkins setup + initial pipelines
 - GitHub Actions workflows for CI/CD
+- AWS Services (Cloud Computing)
+- AWS Services (IAM)
+
+
 
 ### 🚧 In Progress
 
-- AWS Services (Cloud Computing)
+- AWS Services (EC2)
 
 ### 🎯 Planned
 
