@@ -1,0 +1,9 @@
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*.tfplan
+# local vars (keep the example file only)
+terraform.tfvars
