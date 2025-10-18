@@ -1,0 +1,27 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs and local output
+*.log
+*.out
+*.zip
+*.tar
+project-zipping/
+project/*.zip
+
+# Virtual environments
+venv/
+.env
+*.env
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Docker / build
+*.pid
+*.sock
+
