@@ -189,19 +189,6 @@ Current focus — learning Kubernetes from beginner to mastery.
 
 ---
 
-### 📊 [Prometheus + Grafana Monitoring Stack](./prometheus-grafana)
-
-End-to-end monitoring setup for Dockerized apps.
-
-- Prometheus metrics scraping configuration
-- Grafana dashboards and alerting rules
-- Node Exporter for system metrics
-- Docker Compose integration
-
-➡️ [Detailed README](./prometheus-grafana/README.md)
-
----
-
 ## 🧠 About
 
 This repo serves as my **DevOps lab** to:
