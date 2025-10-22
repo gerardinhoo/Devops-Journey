@@ -1,5 +1,0 @@
-com/ge/dashboard/model/Weather.class
-com/ge/dashboard/service/CountryService.class
-com/ge/dashboard/model/CountryInfo.class
-com/ge/dashboard/web/SearchServlet.class
-com/ge/dashboard/service/WeatherService.class

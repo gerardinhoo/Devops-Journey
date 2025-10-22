@@ -1,5 +1,42 @@
-*.tar.gz
+# === .gitignore ===
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-debug.log*
+
+# OS/editor clutter
 .DS_Store
-**/node_modules
-**/npm-debug.log*
-**/.env
+.vscode/
+.idea/
+Thumbs.db
+
+# Env & secrets
+.env
+*.env
+*.secret.yaml
+*.pem
+*.key
+*.crt
+
+# Logs & cache
+*.log
+logs/
+.cache/
+dist/
+build/
+coverage/
+
+# Kubernetes / Terraform
+.kube/
+.minikube/
+.terraform/
+terraform.tfstate*
+terraform.tfvars
+
+# Python (if any automation scripts)
+__pycache__/
+*.pyc
+node_modules/

@@ -1,0 +1,53 @@
+# OS / Editor files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+
+# VS Code
+.vscode/
+.idea/
+
+# macOS system
+._*
+.Spotlight-V100
+.Trashes
+
+# Node/npm (if you experiment with Helm or dashboards later)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python (if using scripts or notebooks for automation)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb_checkpoints
+
+# Minikube / Kubernetes local files
+.kube/
+.minikube/
+*.crt
+*.key
+*.pem
+*.csr
+
+# Terraform (if used later in same repo)
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
+.terraform.lock.hcl
+
+# Sensitive data / Secrets (best practice)
+*.secret.yaml
+*.env
+*.key.json
+*.pem
+
+# Logs / outputs
+logs/
+*.out
+*.log
