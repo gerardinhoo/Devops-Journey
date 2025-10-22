@@ -142,7 +142,7 @@ Exploring **Jenkins CI/CD pipelines**:
 - Freestyle and Pipeline jobs
 - GitHub webhook integration
 - Jenkinsfile with build/test/deploy stages
-- Future: Trivy scans, SonarQube checks, Slack notifications
+- Trivy scans, SonarQube checks, Slack notifications
 
 ➡️ [Detailed README](./Jenkins-Work/README.md)
 
@@ -159,6 +159,46 @@ CI/CD with **GitHub Actions**:
 
 [**Detailed README →**](./gh-actions-node-docker/README.md)
 ![CI/CD – gh-actions-node-docker](https://github.com/gerardinhoo/Devops-Journey/actions/workflows/ci-cd-gh-actions-node-docker.yml/badge.svg)
+
+---
+
+### ☁️ [AWS Services](./aws-services)
+
+Learning and practicing AWS fundamentals and core services:
+
+- EC2: Virtual machines for compute workloads
+- S3: Object storage for backups, logs, and static websites
+- IAM: Identity & Access Management for users and roles
+- Lambda: Serverless compute functions
+- RDS: Managed relational database service
+
+➡️ [Detailed README](./aws-services/README.md)
+
+---
+
+### ☸️ [Kubernetes Deployments](./kubernetes_labs)
+
+Current focus — learning Kubernetes from beginner to mastery.
+
+- Minikube setup and cluster management
+- Pods, ReplicaSets, Deployments, Services
+- ConfigMaps, Secrets, Probes
+- Persistent Volumes, StatefulSets (coming next)
+
+➡️ [Detailed README](./kubernetes_labs/README.md)
+
+---
+
+### 📊 [Prometheus + Grafana Monitoring Stack](./prometheus-grafana)
+
+End-to-end monitoring setup for Dockerized apps.
+
+- Prometheus metrics scraping configuration
+- Grafana dashboards and alerting rules
+- Node Exporter for system metrics
+- Docker Compose integration
+
+➡️ [Detailed README](./prometheus-grafana/README.md)
 
 ---
 
@@ -183,23 +223,22 @@ This repo serves as my **DevOps lab** to:
 - Node.js app containerized + deployed to EC2
 - Flask app containerized + Docker Compose (dev/prod)
 - Monolith → Microservices refactor (users/orders services)
-- Jenkins setup + initial pipelines
+- Jenkins setup + pipelines
 - GitHub Actions workflows for CI/CD
-- AWS Services (Cloud Computing)
-- AWS Services (IAM)
+- AWS Services (EC2, S3, IAM, Lambda, RDS)
+- Prometheus + Grafana monitoring stack
 
-
+---
 
 ### 🚧 In Progress
 
-- AWS Services (EC2)
+- Kubernetes deployments (Minikube + EC2 multi-node setup)
+
+---
 
 ### 🎯 Planned
 
-- AWS services (EC2, S3, IAM, Lambda, RDS)
-- Kubernetes deployments (EKS/GKE)
 - Ansible automation (config management)
-- Prometheus + Grafana monitoring stack
 - Python automation scripts
 - Centralized logging (EFK/ELK, OpenTelemetry)
 - Secrets management (Vault, cloud-native solutions)
