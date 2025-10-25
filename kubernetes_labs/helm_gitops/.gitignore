@@ -1,0 +1,12 @@
+# helm
+*.tgz
+*.lock
+
+# editor
+.DS_Store
+.idea/
+.vscode/
+
+# misc
+*.local
+*.env

@@ -1,0 +1,26 @@
+fullnameOverride: webapp
+replicaCount: 2
+image:
+  repository: ghcr.io/gerardinhoo/webapp
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 80
+
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+    - host: webapp.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits: { cpu: 500m, memory: 256Mi }
+
+autoscaling:
+  enabled: false

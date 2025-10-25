@@ -1,0 +1,54 @@
+replicaCount: 2
+
+image:
+  repository: nginx
+  tag: "1.25-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "64Mi"
+  limits:
+    cpu: "200m"
+    memory: "128Mi"
+
+ingress:
+  enabled: false
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+httpRoute:
+  enabled: false # keep false unless you’ve installed Gateway API
+  host: ""
+  path: /
+  port: 80
+  tls: false
+  # If you are using Gateway API, set these accordingly:
+  gateway:
+    name: ""
+    namespace: ""
+autoscaling:
+  enabled: false # set true when you add an HPA
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  # targetMemoryUtilizationPercentage: 80
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podSecurityContext: {}
+securityContext: {}
+
+volumeMounts: []
+volumes: []
