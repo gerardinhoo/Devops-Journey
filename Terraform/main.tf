@@ -40,9 +40,7 @@ data "aws_subnets" "default_public" {
   }
 }
 
-##############################################################
 # Resource: Security Group (standalone, NOT inside EC2)
-##############################################################
 resource "aws_security_group" "web_sg" {
   name        = "tf-web-sg"
   description = "Allow SSH (and optional HTTP) to EC2"
@@ -83,9 +81,7 @@ resource "aws_security_group" "web_sg" {
   )
 }
 
-##############################################################
 # Resource: EC2 Instance
-##############################################################
 resource "aws_instance" "web_server" {
   ami           = var.ami_id
   instance_type = var.instance_type

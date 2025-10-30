@@ -35,21 +35,21 @@ variable "common_tags" {
 }
 
 
-# Name of an EXISTING EC2 key pair in your AWS account (do not commit the .pem)
+# Name of an EXISTING EC2 key pair in my AWS account
 variable "key_pair_name" {
   description = "Existing EC2 key pair name to use for SSH"
   type        = string
   default     = "gerard-amazonlinux-key"
 }
 
-# CIDR allowed to SSH (use YOUR_IP/32 for security)
+# CIDR allowed to SSH (use of IP/32 for security)
 variable "ssh_ingress_cidr" {
   description = "CIDR allowed for SSH ingress (use x.x.x.x/32)"
   type        = string
   default     = "0.0.0.0/0" # tighten to your IP before prod
 }
 
-# Optional: open HTTP 80 for quick tests (nginx, etc.)
+# Open HTTP 80 for quick tests (nginx, etc.)
 variable "enable_http" {
   description = "Whether to open port 80"
   type        = bool
