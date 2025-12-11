@@ -1,42 +1,128 @@
-# === .gitignore ===
+##############################
+# macOS System Files
+##############################
+.DS_Store
+.AppleDouble
+.LSOverride
+
+##############################
+# VS Code
+##############################
+.vscode/
+.history/
+
+##############################
 # Node.js
+##############################
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 package-lock.json
-.pnpm-debug.log*
+pnpm-lock.yaml
 
-# OS/editor clutter
-.DS_Store
-.vscode/
-.idea/
-Thumbs.db
-
-# Env & secrets
+##############################
+# Python
+##############################
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pytest_cache/
 .env
-*.env
-*.secret.yaml
+.venv/
+venv/
+
+##############################
+# Terraform
+##############################
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.tfstate.lock.info
+
+##############################
+# Kubernetes
+##############################
+.kube/
+
+##############################
+# Docker
+##############################
+docker/volumes/
+docker/*.log
+
+##############################
+# Logs
+##############################
+*.log
+logs/
+*.out
+
+##############################
+# Secrets (avoid committing)
+##############################
 *.pem
 *.key
 *.crt
+*.p12
+*.env
+*.tfvars
+*.tfvars.json
 
-# Logs & cache
-*.log
-logs/
-.cache/
+##############################
+# System Files
+##############################
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+##############################
+# Build / Output
+##############################
 dist/
 build/
-coverage/
+tmp/
+temp/
 
-# Kubernetes / Terraform
-.kube/
-.minikube/
-.terraform/
-terraform.tfstate*
-terraform.tfvars
+##############################
+# Java / Maven
+##############################
+target/
+*.war
+*.jar
+*.class
+.mvn/
 
-# Python (if any automation scripts)
-__pycache__/
-*.pyc
-node_modules/
+##############################
+# JetBrains IDE (IntelliJ / PyCharm)
+##############################
+.idea/
+*.iml
+out/
+
+##############################
+# Go
+##############################
+bin/
+vendor/
+
+##############################
+# Rust
+##############################
+target/
+
+##############################
+# Misc
+##############################
+*.swp
+*.swo
