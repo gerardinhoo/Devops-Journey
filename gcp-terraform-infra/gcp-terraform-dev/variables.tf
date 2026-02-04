@@ -1,20 +1,20 @@
 # Defines input variables used by main.tf
 
 variable "project_id" {
-   description = "The GCP Project ID"
-   type        = string
+  description = "The GCP Project ID"
+  type        = string
 }
 
 variable "region" {
-   description = "The GCP region to deploy resources in"
-   type        = string
-   default     = "us-central1"
+  description = "The GCP region to deploy resources in"
+  type        = string
+  default     = "us-central1"
 }
 
 variable "zone" {
-   description = "The GCP zone to deploy resources in"
-   type        = string
-   default     = "us-central1-a"
+  description = "The GCP zone to deploy resources in"
+  type        = string
+  default     = "us-central1-a"
 }
 
 variable "subnet_name" {
