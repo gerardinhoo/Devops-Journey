@@ -1,4 +1,4 @@
-# 🚀 GCP Infrastructure Setup with Terraform
+# 🚀 GCP Infrastructure & Host Bootstrapping (Terraform + Ansible)
 
 This project provisions and manages a complete infrastructure on **Google Cloud Platform** using **Terraform**, following real-world DevOps practices.
 
