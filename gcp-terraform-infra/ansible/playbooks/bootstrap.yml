@@ -1,0 +1,29 @@
+- name: Bootstrap base server packages
+  hosts: gcp_vms
+  become: true
+
+  tasks:
+    - name: "Wait for apt/dpkg lock to be released"
+      ansible.builtin.shell: |
+        while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1 \
+          || sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+          echo "apt is locked - waiting..."
+          sleep 5
+        done
+      changed_when: false
+
+    - name: "Update apt cache (like: sudo apt update)"
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install baseline packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - unzip
+          - git
+          - htop
+          - jq
+        state: present
