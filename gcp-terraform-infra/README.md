@@ -4,13 +4,11 @@ This project provisions and manages a complete infrastructure on **Google Cloud 
 
 ---
 
-## ✅ What’s Been Done So Far
-
 ### 1. 📊 Architecture Diagram
 
 A high-level view of the infrastructure provisioning using Terraform and GCP:
 
-![Architecture Diagram](./assets/architecture-diagram.png)
+![Architecture Diagram](./assets/architecture_diagram.png)
 
 ---
 
@@ -68,7 +66,7 @@ Terraform workspaces were used to deploy two separate VM instances.
 
 ---
 
-### 4. 🖥️ SSH Verification & Software Installation
+### 5. 🖥️ SSH Verification & Software Installation
 
 - Connected to VM via `gcloud compute ssh`
 - Verified Docker and Git installed using startup script
@@ -77,7 +75,46 @@ Terraform workspaces were used to deploy two separate VM instances.
 
 ---
 
-### 5. 🌱 Terraform Workspaces: `dev` and `prod`
+### 6. ⚙️ Ansible Integration Overview
+
+This document describes how **Ansible** was integrated into the GCP Terraform infrastructure project to handle **post-provisioning configuration** in a clean, repeatable, and production-style workflow.
+
+Ansible is intentionally scoped to **host bootstrapping and runtime configuration**, while Terraform remains responsible for **infrastructure provisioning**.
+
+---
+
+## Why Ansible?
+
+Terraform excels at provisioning cloud resources such as:
+- VPCs
+- Subnets
+- Firewall rules
+- Compute Engine VMs
+
+However, Terraform is **not designed for ongoing OS configuration**.
+
+Ansible complements Terraform by:
+- Configuring the operating system after the VM exists
+- Installing and managing system packages
+- Enforcing idempotent configuration without reprovisioning infrastructure
+
+This separation of concerns reflects real-world DevOps best practices.
+
+---
+
+## What Ansible Manages
+
+Ansible is used for the following responsibilities in this project:
+
+### 1. Host Connectivity Validation
+- Inventory defines the VM public IP and SSH user
+- Ansible `ping` playbook validates SSH access and Python availability
+
+```bash
+ansible-playbook playbooks/ping.yml
+```
+
+### 7. 🌱 Terraform Workspaces: `dev` and `prod`
 
 Resources were dynamically named and isolated per environment:
 
@@ -94,18 +131,26 @@ Resources were dynamically named and isolated per environment:
 
 ---
 
-### 6. ✅ Outputs Used
+### 8. ✅ Outputs Used
 
 - External IPs, VM names, and other identifiers used for debugging and CI/CD
 
 ---
 
-## 7. 📁 Project Structure
+## 9. 📁 Project Structure
 
 ```plaintext
 GCP-TERRAFORM-INFRA/
 ├── assets/
 │   └── architecture-diagram.png
+├── ansible/
+│   ├── ansible.cfg
+│   ├── inventories/
+│   │   └── hosts.ini
+│   └── playbooks/
+│       ├── ping.yml
+│       ├── bootstrap.yml
+│       └── docker.yml
 ├── gcp-terraform-dev/
 │   ├── backend.tf
 │   ├── main.tf
@@ -123,12 +168,6 @@ GCP-TERRAFORM-INFRA/
 ├── README.md
 └── .terraform.lock.hcl
 
-
-## 🏁 Next Steps
-- [ ] Monitoring via Stackdriver or Prometheus (GCP infra)
-- [ ] CI/CD with GitHub Actions for Terraform
-- [ ] Reusable modules refactor
-- [ ] Secrets management via Vault or GCP Secrets Manager
 
 ---
 
