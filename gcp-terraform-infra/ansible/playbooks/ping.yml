@@ -1,0 +1,6 @@
+- name: Ping hosts
+  hosts: gcp_vms
+  become: false
+  tasks:
+    - name: Ping
+      ansible.builtin.ping:

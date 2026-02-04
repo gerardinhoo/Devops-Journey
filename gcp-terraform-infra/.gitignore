@@ -1,3 +1,7 @@
+# Secrets
 terraform-admin-key.json
 .terraform/
 terraform.tfstate*
+**/*.pem
+**/*.key
+**/.env
