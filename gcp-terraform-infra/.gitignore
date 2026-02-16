@@ -5,3 +5,7 @@ terraform.tfstate*
 **/*.pem
 **/*.key
 **/.env
+
+# Environment-specific values (may contain IPs, secrets)
+*.tfvars
+!*.tfvars.example

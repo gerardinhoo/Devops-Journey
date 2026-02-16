@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and fill in your values
+# cp terraform.tfvars.example terraform.tfvars
+
+project_id      = "your-gcp-project-id"
+region          = "us-central1"
+zone            = "us-central1-a"
+vpc_name        = "devops-vpc-dev"
+subnet_name     = "devops-subnet-dev"
+firewall_name   = "devops-firewall-dev"
+vm_name         = "devops-vm"
+env             = "dev"
+ssh_allowed_ips = ["YOUR_IP/32"]  # Run: curl -s ifconfig.me

@@ -55,3 +55,9 @@ variable "env" {
   description = "Environment name (dev or prod)"
   type        = string
 }
+
+variable "ssh_allowed_ips" {
+  description = "List of IP ranges allowed to SSH (CIDR notation)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]  # Override this in terraform.tfvars!
+}
