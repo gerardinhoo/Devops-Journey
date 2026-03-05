@@ -1,174 +1,136 @@
-# 🚀 GCP Infrastructure & Host Bootstrapping (Terraform + Ansible)
+# GCP Infrastructure Automation (Terraform + Ansible)
 
-This project provisions and manages a complete infrastructure on **Google Cloud Platform** using **Terraform**, following real-world DevOps practices.
+![Terraform](https://img.shields.io/badge/IaC-Terraform-blue)
+![GCP](https://img.shields.io/badge/Cloud-GCP-orange)
+![Ansible](https://img.shields.io/badge/Config-Ansible-red)
 
 ---
 
-### 1. 📊 Architecture Diagram
+Provisioned a full GCP environment with Terraform — VPC, subnets, firewall rules, and Compute Engine instances. GCS remote state with Terraform workspaces for dev/prod isolation. Ansible handles post-provision configuration: OS bootstrapping, package installation, and Docker runtime setup. End-to-end infrastructure lifecycle automation from provisioning to runtime readiness.
 
-A high-level view of the infrastructure provisioning using Terraform and GCP:
+---
+
+## Architecture
 
 ![Architecture Diagram](./assets/architecture_diagram.png)
 
 ---
 
-### 2. 🔧 Terraform Files Created
+## What This Provisions
 
-#### Development Environment
+**Networking**
+- Custom VPC with defined CIDR ranges
+- Subnets for dev and prod environments
+- Firewall rules allowing HTTP (80) and SSH (22) ingress
 
-- **gcp-terraform-dev/main.tf**: Core infrastructure setup (VPC, Subnet, Firewall, VM)
-- **gcp-terraform-dev/variables.tf**: Input variables for flexibility and reuse
-- **gcp-terraform-dev/terraform.tfvars**: Concrete values for the defined variables
-- **gcp-terraform-dev/startup.sh**: Provisioning script to install Docker (or any other app) during VM startup
-- **gcp-terraform-dev/outputs.tf**: Outputs to extract and display useful runtime data
+**Compute**
+- Compute Engine VM instances per environment
+- Startup script for initial Docker/Git installation
+- Outputs for external IPs and VM identifiers
 
-#### Production Environment
+**State Management**
+- GCS remote backend for Terraform state
+- Workspace isolation — `dev` and `prod` maintain separate state files
+- Dynamic resource naming with environment suffixes (`-dev`, `-prod`)
 
-- **gcp-terraform-prod/main.tf**: Core infrastructure setup (VPC, Subnet, Firewall, VM)
-- **gcp-terraform-prod/variables.tf**: Input variables for flexibility and reuse
-- **gcp-terraform-prod/terraform.tfvars**: Concrete values for the defined variables
-- **gcp-terraform-prod/startup.sh**: Provisioning script to install Docker (or any other app) during VM startup
-- **gcp-terraform-prod/outputs.tf**: Outputs to extract and display useful runtime data
+**Configuration Management (Ansible)**
+- `ping.yml` — Validates SSH connectivity and Python availability
+- `bootstrap.yml` — Updates apt cache, installs baseline packages (curl, git, htop, jq)
+- `docker.yml` — Adds Docker’s GPG key and apt repo, installs Docker Engine, enables the service, adds user to docker group
+
+Terraform provisions the infrastructure. Ansible configures the OS. This separation ensures infrastructure can be reprovisioned without losing configuration logic, and configuration can be re-applied without touching infrastructure.
 
 ---
 
-### 3. 🌐 Infrastructure Provisioned on GCP
+## Screenshots
 
-#### ✅ VPC and Subnet - Dev And Prod Environments
-
-Created a custom VPC and subnet with defined IP ranges.
-
-##### ✅ Dev Environment
-
+### VPC + Subnet (Dev)
 ![VPC + Subnet Dev](./assets/vpc-subnet-dev.png)
 
----
-
-##### ✅ Prod Environment
-
+### VPC + Subnet (Prod)
 ![VPC + Subnet Prod](./assets/vpc-subnet-prod.png)
 
----
-
-#### ✅ Firewall Rule
-
-Allowing inbound HTTP and SSH access via TCP 80 and 22.
-
+### Firewall Rules
 ![Firewall Rule](./assets/firewall-rule.png)
 
----
-
-#### ✅ VM Instances for Dev & Prod Workspaces
-
-Terraform workspaces were used to deploy two separate VM instances.
-
+### VM Instances (Dev + Prod Workspaces)
 ![VM Instances](./assets/vm-list.png)
 
 ---
 
-### 5. 🖥️ SSH Verification & Software Installation
+## Project Structure
 
-- Connected to VM via `gcloud compute ssh`
-- Verified Docker and Git installed using startup script
-
-![SSH Verification](./assets/ssh-verification.png)
-
----
-
-### 6. ⚙️ Ansible Integration Overview
-
-This document describes how **Ansible** was integrated into the GCP Terraform infrastructure project to handle **post-provisioning configuration** in a clean, repeatable, and production-style workflow.
-
-Ansible is intentionally scoped to **host bootstrapping and runtime configuration**, while Terraform remains responsible for **infrastructure provisioning**.
-
----
-
-## Why Ansible?
-
-Terraform excels at provisioning cloud resources such as:
-- VPCs
-- Subnets
-- Firewall rules
-- Compute Engine VMs
-
-However, Terraform is **not designed for ongoing OS configuration**.
-
-Ansible complements Terraform by:
-- Configuring the operating system after the VM exists
-- Installing and managing system packages
-- Enforcing idempotent configuration without reprovisioning infrastructure
-
-This separation of concerns reflects real-world DevOps best practices.
-
----
-
-## What Ansible Manages
-
-Ansible is used for the following responsibilities in this project:
-
-### 1. Host Connectivity Validation
-- Inventory defines the VM public IP and SSH user
-- Ansible `ping` playbook validates SSH access and Python availability
-
-```bash
-ansible-playbook playbooks/ping.yml
 ```
-
-### 7. 🌱 Terraform Workspaces: `dev` and `prod`
-
-Resources were dynamically named and isolated per environment:
-
-| Feature               | Benefit                                         |
-| --------------------- | ----------------------------------------------- |
-| Environment isolation | Separate `dev` and `prod` resources             |
-| Dynamic naming        | `-dev` and `-prod` suffixes added automatically |
-| GCS remote backend    | Each workspace has isolated tfstate in GCS      |
-
-> Example:
-
-- `devops-vm-dev`, `devops-vpc-dev`, `devops-subnet-dev`
-- `devops-vm-prod`, `devops-vpc-prod`, `devops-subnet-prod`
-
----
-
-### 8. ✅ Outputs Used
-
-- External IPs, VM names, and other identifiers used for debugging and CI/CD
-
----
-
-## 9. 📁 Project Structure
-
-```plaintext
-GCP-TERRAFORM-INFRA/
+gcp-terraform-infra/
 ├── assets/
-│   └── architecture-diagram.png
+│   └── architecture_diagram.png
 ├── ansible/
 │   ├── ansible.cfg
 │   ├── inventories/
-│   │   └── hosts.ini
+│   │   ├── dev/hosts.ini
+│   │   └── prod/hosts.ini
 │   └── playbooks/
-│       ├── ping.yml
-│       ├── bootstrap.yml
-│       └── docker.yml
+│       ├── ping.yml          # Connectivity validation
+│       ├── bootstrap.yml     # OS packages (curl, git, htop, jq)
+│       └── docker.yml        # Docker Engine installation + config
 ├── gcp-terraform-dev/
-│   ├── backend.tf
-│   ├── main.tf
-│   ├── outputs.tf
-│   ├── startup.sh
+│   ├── backend.tf            # GCS remote state config
+│   ├── main.tf               # VPC, subnet, firewall, VM
+│   ├── variables.tf
 │   ├── terraform.tfvars
-│   └── variables.tf
+│   ├── outputs.tf
+│   └── startup.sh            # VM startup provisioning
 ├── gcp-terraform-prod/
 │   ├── backend.tf
 │   ├── main.tf
-│   ├── outputs.tf
-│   ├── startup.sh
+│   ├── variables.tf
 │   ├── terraform.tfvars
-│   └── variables.tf
-├── README.md
-└── .terraform.lock.hcl
-
+│   ├── outputs.tf
+│   └── startup.sh
+└── README.md
+```
 
 ---
 
+## Usage
+
+### 1. Provision infrastructure
+
+```bash
+cd gcp-terraform-dev
+terraform init
+terraform workspace select dev  # or: terraform workspace new dev
+terraform plan
+terraform apply
 ```
+
+### 2. Configure hosts with Ansible
+
+```bash
+cd ansible
+ansible-playbook playbooks/ping.yml        # Validate connectivity
+ansible-playbook playbooks/bootstrap.yml   # Install base packages
+ansible-playbook playbooks/docker.yml      # Install Docker
+```
+
+---
+
+## Key Design Decisions
+
+**Terraform workspaces for env isolation** — Same codebase provisions dev and prod. Resources are dynamically named (`devops-vm-dev`, `devops-vpc-prod`) and state files are isolated in GCS.
+
+**Ansible for configuration, not provisioning** — Terraform creates infrastructure; Ansible configures it. This separation means you can re-provision a VM without losing playbook logic, and re-run playbooks without touching infrastructure.
+
+**Idempotent playbooks** — All Ansible tasks use modules (`apt`, `service`, `user`) that are safe to run multiple times. Apt lock handling prevents failures during concurrent package operations.
+
+---
+
+## Technologies
+
+- **Terraform** — Infrastructure as Code
+- **GCP** — VPC, Subnets, Firewall Rules, Compute Engine, GCS
+- **Ansible** — Configuration Management
+
+---
+
+**Author:** [Gerard Eklu](https://github.com/gerardinhoo)
