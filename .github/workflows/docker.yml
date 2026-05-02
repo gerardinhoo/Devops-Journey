@@ -13,26 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
+      - name: Build simple-node-api image
+        uses: docker/build-push-action@v6
         with:
           context: ./simple-node-api
-          push: true
-          tags: gerardinhoo/simple-node-api:latest
+          push: false
+          tags: simple-node-api:ci
+      - name: Verify simple-node-api metadata
+        run: test -f simple-node-api/package.json
 
   build-docker-python-flask:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
+      - name: Build docker-python-flask image
+        uses: docker/build-push-action@v6
         with:
           context: ./docker-python-flask
-          push: true
-          tags: gerardinhoo/docker-python-flask:latest
+          push: false
+          tags: docker-python-flask:ci
