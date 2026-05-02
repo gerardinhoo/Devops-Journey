@@ -73,20 +73,19 @@ gcp-terraform-infra/
 │       ├── ping.yml          # Connectivity validation
 │       ├── bootstrap.yml     # OS packages (curl, git, htop, jq)
 │       └── docker.yml        # Docker Engine installation + config
-├── gcp-terraform-dev/
-│   ├── backend.tf            # GCS remote state config
-│   ├── main.tf               # VPC, subnet, firewall, VM
-│   ├── variables.tf
-│   ├── terraform.tfvars
-│   ├── outputs.tf
-│   └── startup.sh            # VM startup provisioning
-├── gcp-terraform-prod/
-│   ├── backend.tf
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── terraform.tfvars
-│   ├── outputs.tf
-│   └── startup.sh
+├── environments/
+│   ├── dev/
+│   │   ├── backend.tf
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── terraform.tfvars.example
+│   │   └── outputs.tf
+│   └── prod/
+│       ├── backend.tf
+│       ├── main.tf
+│       ├── variables.tf
+│       ├── terraform.tfvars.example
+│       └── outputs.tf
 └── README.md
 ```
 
@@ -97,7 +96,8 @@ gcp-terraform-infra/
 ### 1. Provision infrastructure
 
 ```bash
-cd gcp-terraform-dev
+cd environments/dev
+cp terraform.tfvars.example terraform.tfvars
 terraform init
 terraform workspace select dev  # or: terraform workspace new dev
 terraform plan
@@ -118,6 +118,8 @@ ansible-playbook playbooks/docker.yml      # Install Docker
 ## Key Design Decisions
 
 **Terraform workspaces for env isolation** — Same codebase provisions dev and prod. Resources are dynamically named (`devops-vm-dev`, `devops-vpc-prod`) and state files are isolated in GCS.
+
+**No committed environment secrets** — Example `terraform.tfvars` files are provided, but live environment values stay local and are not committed to the repository.
 
 **Ansible for configuration, not provisioning** — Terraform creates infrastructure; Ansible configures it. This separation means you can re-provision a VM without losing playbook logic, and re-run playbooks without touching infrastructure.
 

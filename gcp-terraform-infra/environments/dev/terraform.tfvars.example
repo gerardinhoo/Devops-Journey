@@ -1,0 +1,11 @@
+# Copy this file to terraform.tfvars and replace the placeholder values.
+
+project_id      = "your-gcp-project-id"
+region          = "us-central1"
+zone            = "us-central1-a"
+vpc_name        = "devops-vpc-dev"
+subnet_name     = "devops-subnet-dev"
+firewall_name   = "devops-firewall-dev"
+vm_name         = "devops-vm-dev"
+env             = "dev"
+ssh_allowed_ips = ["YOUR_IP/32"]
